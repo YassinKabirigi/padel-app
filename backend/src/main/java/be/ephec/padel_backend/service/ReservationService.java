@@ -1,8 +1,11 @@
 package be.ephec.padel_backend.service;
 
 import be.ephec.padel_backend.entity.*;
-        import be.ephec.padel_backend.repository.JourFermetureRepository;
+import be.ephec.padel_backend.repository.JourFermetureRepository;
 import be.ephec.padel_backend.repository.MatchRepository;
+import be.ephec.padel_backend.repository.MembreRepository;
+import be.ephec.padel_backend.repository.ParticipationRepository;
+import be.ephec.padel_backend.repository.TerrainRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +23,21 @@ public class ReservationService {
 
     private final MatchRepository matchRepository;
     private final JourFermetureRepository jourFermetureRepository;
+    private final TerrainRepository terrainRepository;
+    private final MembreRepository membreRepository;
+    private final ParticipationRepository participationRepository;
 
     @Autowired
     public ReservationService(MatchRepository matchRepository,
-                              JourFermetureRepository jourFermetureRepository) {
+                              JourFermetureRepository jourFermetureRepository,
+                              TerrainRepository terrainRepository,
+                              MembreRepository membreRepository,
+                              ParticipationRepository participationRepository) {
         this.matchRepository = matchRepository;
         this.jourFermetureRepository = jourFermetureRepository;
+        this.terrainRepository = terrainRepository;
+        this.membreRepository = membreRepository;
+        this.participationRepository = participationRepository;
     }
 
     /**
@@ -52,10 +64,6 @@ public class ReservationService {
         return true;
     }
 
-    /**
-     * Le site est ouvert s'il n'y a ni fermeture globale, ni fermeture
-     * spécifique à ce site, à la date demandée.
-     */
     private boolean isSiteOuvert(Site site, LocalDate date) {
         List<JourFermeture> fermetures = jourFermetureRepository.findAll();
 
@@ -72,10 +80,6 @@ public class ReservationService {
         return true;
     }
 
-    /**
-     * Vérifie que le match (début et fin) reste dans les horaires
-     * d'ouverture/fermeture du site.
-     */
     private boolean isDansHorairesSite(Site site, LocalDateTime debut, LocalDateTime fin) {
         LocalDateTime ouvertureCeJour = debut.toLocalDate().atTime(site.getHeureOuverture());
         LocalDateTime fermetureCeJour = debut.toLocalDate().atTime(site.getHeureFermeture());
@@ -83,11 +87,6 @@ public class ReservationService {
         return !debut.isBefore(ouvertureCeJour) && !fin.isAfter(fermetureCeJour);
     }
 
-    /**
-     * Vérifie qu'aucun match existant sur ce terrain ne chevauche le
-     * nouveau créneau, en tenant compte du battement de 15 min de
-     * chaque côté (donc un blocage réel de 105 min par match existant).
-     */
     private boolean isChevauchementAvecMatchExistant(Terrain terrain, LocalDateTime nouveauDebut) {
         LocalDateTime nouveauFinBloquee = nouveauDebut.plusMinutes(BLOCAGE_TOTAL_MINUTES);
 
@@ -99,7 +98,6 @@ public class ReservationService {
             LocalDateTime existantDebut = existant.getDateHeureDebut();
             LocalDateTime existantFinBloquee = existantDebut.plusMinutes(BLOCAGE_TOTAL_MINUTES);
 
-            // Chevauchement si les deux plages [debut, finBloquee] se croisent
             boolean chevauche = nouveauDebut.isBefore(existantFinBloquee)
                     && existantDebut.isBefore(nouveauFinBloquee);
 
@@ -110,10 +108,6 @@ public class ReservationService {
         return false;
     }
 
-    /**
-     * Vérifie que le membre respecte le délai minimum de réservation
-     * selon son type (Global : 21j, Site : 14j, Libre : 5j).
-     */
     public boolean isDelaiRespecte(Membre membre, LocalDateTime dateMatch) {
         long joursAvantMatch = ChronoUnit.DAYS.between(LocalDate.now(), dateMatch.toLocalDate());
         int delaiMinimum = getDelaiMinimumJours(membre.getTypeMembre());
@@ -128,25 +122,64 @@ public class ReservationService {
         };
     }
 
-    /**
-     * Pour un MembreSite, vérifie que le terrain appartient bien
-     * à son site de rattachement.
-     */
     public boolean isTerrainAutorise(Membre membre, Terrain terrain) {
         if (membre.getTypeMembre() != Membre.TypeMembre.SITE) {
-            return true; // Global et Libre peuvent réserver n'importe où
+            return true;
         }
         return membre.getSite() != null
                 && membre.getSite().getIdSite().equals(terrain.getSite().getIdSite());
     }
 
-    /**
-     * Vérifie que le membre n'a pas de pénalité active à la date du jour.
-     */
     public boolean isPenaliteActive(Membre membre) {
         if (membre.getDateFinPenalite() == null) {
             return false;
         }
         return membre.getDateFinPenalite().isAfter(LocalDate.now());
+    }
+
+    /**
+     * Orchestration complete : verifie toutes les regles puis cree le match
+     * et la participation de l'organisateur. Leve une IllegalStateException
+     * avec un message explicite si une regle n'est pas respectee.
+     */
+    public Match creerMatch(Integer idTerrain, LocalDateTime dateHeureDebut,
+                            Match.Statut statut, String matriculeOrganisateur) {
+
+        Terrain terrain = terrainRepository.findById(idTerrain)
+                .orElseThrow(() -> new IllegalStateException("Terrain introuvable"));
+
+        Membre organisateur = membreRepository.findById(matriculeOrganisateur)
+                .orElseThrow(() -> new IllegalStateException("Membre introuvable"));
+
+        if (isPenaliteActive(organisateur)) {
+            throw new IllegalStateException("Le membre a une penalite active");
+        }
+
+        if (!isDelaiRespecte(organisateur, dateHeureDebut)) {
+            throw new IllegalStateException("Delai de reservation non respecte pour ce type de membre");
+        }
+
+        if (!isTerrainAutorise(organisateur, terrain)) {
+            throw new IllegalStateException("Ce membre ne peut pas reserver sur ce terrain");
+        }
+
+        if (!isCreneauDisponible(terrain, dateHeureDebut)) {
+            throw new IllegalStateException("Creneau non disponible");
+        }
+
+        Match match = new Match();
+        match.setTerrain(terrain);
+        match.setDateHeureDebut(dateHeureDebut);
+        match.setStatut(statut);
+        Match matchSauvegarde = matchRepository.save(match);
+
+        Participation participationOrganisateur = new Participation();
+        participationOrganisateur.setMatch(matchSauvegarde);
+        participationOrganisateur.setMembre(organisateur);
+        participationOrganisateur.setEstOrganisateur(true);
+        participationOrganisateur.setDateInscription(LocalDateTime.now());
+        participationRepository.save(participationOrganisateur);
+
+        return matchSauvegarde;
     }
 }
