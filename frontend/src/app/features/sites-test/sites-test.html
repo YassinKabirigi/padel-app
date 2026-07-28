@@ -1,0 +1,15 @@
+<h2>Test de connexion API — Sites</h2>
+
+@if (erreur) {
+  <p style="color: red;">{{ erreur }}</p>
+}
+
+@if (sites.length > 0) {
+  <ul>
+    @for (site of sites; track site.idSite) {
+      <li>{{ site.nom }} — {{ site.adresse }}</li>
+    }
+  </ul>
+} @else if (!erreur) {
+  <p>Chargement... (ou aucun site en base pour l'instant)</p>
+}
