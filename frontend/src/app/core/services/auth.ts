@@ -13,9 +13,9 @@ export interface LoginResponse {
 })
 export class Auth {
   private apiUrl = 'http://localhost:8080/api/auth';
-  private tokenKey = 'padel_token';
   private currentToken: string | null = null;
   private currentTypeMembre: string | null = null;
+  private currentMatricule: string | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -24,6 +24,7 @@ export class Auth {
       tap((response) => {
         this.currentToken = response.token;
         this.currentTypeMembre = response.typeMembre;
+        this.currentMatricule = response.matricule;
       })
     );
   }
@@ -31,6 +32,7 @@ export class Auth {
   logout(): void {
     this.currentToken = null;
     this.currentTypeMembre = null;
+    this.currentMatricule = null;
   }
 
   getToken(): string | null {
@@ -39,6 +41,10 @@ export class Auth {
 
   getTypeMembre(): string | null {
     return this.currentTypeMembre;
+  }
+
+  getMatricule(): string | null {
+    return this.currentMatricule;
   }
 
   isAuthenticated(): boolean {

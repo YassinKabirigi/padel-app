@@ -29,7 +29,7 @@ export class Login {
     this.authService.login(this.matricule).subscribe({
       next: () => {
         this.chargement = false;
-        this.router.navigate(['/sites']);
+        this.router.navigate(['/reservation']);
       },
       error: (err) => {
         this.chargement = false;

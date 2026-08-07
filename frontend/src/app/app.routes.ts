@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
 import { Login } from './features/login/login';
-import { SitesTest } from './features/sites-test/sites-test';
+import { Reservation } from './features/reservation/reservation';
 import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
-  { path: 'sites', component: SitesTest, canActivate: [authGuard] },
+  { path: 'reservation', component: Reservation, canActivate: [authGuard] },
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];
