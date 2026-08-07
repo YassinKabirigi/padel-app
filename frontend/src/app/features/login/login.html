@@ -1,25 +1,23 @@
-<div style="max-width: 400px; margin: 4rem auto; padding: 2rem; border: 1px solid #ccc; border-radius: 8px;">
-  <h2>Connexion</h2>
+<div style="max-width: 400px; margin: 4rem auto;">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Connexion</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Matricule</mat-label>
+          <input matInput [(ngModel)]="matricule" name="matricule" placeholder="Ex: G0042" />
+        </mat-form-field>
 
-  <form (ngSubmit)="onSubmit()">
-    <div style="margin-bottom: 1rem;">
-      <label for="matricule">Matricule</label><br>
-      <input
-        id="matricule"
-        type="text"
-        [(ngModel)]="matricule"
-        name="matricule"
-        placeholder="Ex: G0042"
-        style="width: 100%; padding: 0.5rem;"
-      />
-    </div>
+        @if (erreur) {
+          <p style="color: red;">{{ erreur }}</p>
+        }
 
-    @if (erreur) {
-      <p style="color: red;">{{ erreur }}</p>
-    }
-
-    <button type="submit" [disabled]="chargement" style="width: 100%; padding: 0.75rem;">
-      {{ chargement ? 'Connexion...' : 'Se connecter' }}
-    </button>
-  </form>
+        <button mat-raised-button color="primary" type="submit" [disabled]="chargement" style="width: 100%;">
+          {{ chargement ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
 </div>

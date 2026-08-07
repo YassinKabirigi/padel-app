@@ -4,10 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { Terrain, TerrainModel } from '../../core/services/terrain';
 import { Match } from '../../core/services/match';
 import { Auth } from '../../core/services/auth';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-reservation',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule],
   templateUrl: './reservation.html',
   styleUrl: './reservation.scss'
 })

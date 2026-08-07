@@ -1,55 +1,61 @@
-<div style="max-width: 600px; margin: 2rem auto; padding: 1rem;">
-  <h2>Réserver un match</h2>
+<div class="page-container">
+  <mat-card style="margin-bottom: 2rem;">
+    <mat-card-header>
+      <mat-card-title>Réserver un match</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Terrain</mat-label>
+          <mat-select [(ngModel)]="idTerrainSelectionne" name="terrain">
+            @for (terrain of terrains; track terrain.idTerrain) {
+              <mat-option [value]="terrain.idTerrain">
+                {{ terrain.site.nom }} — {{ terrain.numero }}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-  <form (ngSubmit)="onSubmit()">
-    <div style="margin-bottom: 1rem;">
-      <label for="terrain">Terrain</label><br>
-      <select id="terrain" [(ngModel)]="idTerrainSelectionne" name="terrain" style="width: 100%; padding: 0.5rem;">
-        <option [ngValue]="null">-- Choisir un terrain --</option>
-        @for (terrain of terrains; track terrain.idTerrain) {
-          <option [ngValue]="terrain.idTerrain">
-            {{ terrain.site.nom }} — {{ terrain.numero }}
-          </option>
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.25rem;">Date</label>
+          <input type="date" [(ngModel)]="date" name="date" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; margin-bottom: 0.25rem;">Heure</label>
+          <input type="time" [(ngModel)]="heure" name="heure" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Type de match</mat-label>
+          <mat-select [(ngModel)]="statut" name="statut">
+            <mat-option value="PRIVE">Privé</mat-option>
+            <mat-option value="PUBLIC">Public</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        @if (erreur) {
+          <p style="color: #c62828;">{{ erreur }}</p>
         }
-      </select>
-    </div>
+        @if (succes) {
+          <p style="color: #2e7d32;">{{ succes }}</p>
+        }
 
-    <div style="margin-bottom: 1rem;">
-      <label for="date">Date</label><br>
-      <input id="date" type="date" [(ngModel)]="date" name="date" style="width: 100%; padding: 0.5rem;" />
-    </div>
+        <button mat-raised-button color="primary" type="submit" [disabled]="chargement" style="width: 100%;">
+          {{ chargement ? 'Envoi...' : 'Réserver' }}
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
 
-    <div style="margin-bottom: 1rem;">
-      <label for="heure">Heure</label><br>
-      <input id="heure" type="time" [(ngModel)]="heure" name="heure" style="width: 100%; padding: 0.5rem;" />
-    </div>
-
-    <div style="margin-bottom: 1rem;">
-      <label for="statut">Type de match</label><br>
-      <select id="statut" [(ngModel)]="statut" name="statut" style="width: 100%; padding: 0.5rem;">
-        <option value="PRIVE">Privé</option>
-        <option value="PUBLIC">Public</option>
-      </select>
-    </div>
-
-    @if (erreur) {
-      <p style="color: red;">{{ erreur }}</p>
-    }
-    @if (succes) {
-      <p style="color: green;">{{ succes }}</p>
-    }
-
-    <button type="submit" [disabled]="chargement" style="width: 100%; padding: 0.75rem;">
-      {{ chargement ? 'Envoi...' : 'Réserver' }}
-    </button>
-  </form>
-
-  <hr style="margin: 2rem 0;">
-
-  <h3>Terrains disponibles</h3>
-  <ul>
-    @for (terrain of terrains; track terrain.idTerrain) {
-      <li>{{ terrain.site.nom }} — {{ terrain.numero }}</li>
-    }
-  </ul>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Terrains disponibles</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @for (terrain of terrains; track terrain.idTerrain) {
+        <p>{{ terrain.site.nom }} — {{ terrain.numero }}</p>
+      }
+    </mat-card-content>
+  </mat-card>
 </div>
