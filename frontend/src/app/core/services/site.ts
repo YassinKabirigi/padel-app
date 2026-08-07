@@ -21,4 +21,7 @@ export class Site {
   getAllSites(): Observable<SiteModel[]> {
     return this.http.get<SiteModel[]>(this.apiUrl);
   }
+  createSite(site: Omit<SiteModel, 'idSite'>): Observable<SiteModel> {
+    return this.http.post<SiteModel>(this.apiUrl, site);
+  }
 }

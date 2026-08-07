@@ -22,4 +22,7 @@ export class Terrain {
   getAllTerrains(): Observable<TerrainModel[]> {
     return this.http.get<TerrainModel[]>(this.apiUrl);
   }
+  createTerrain(terrain: { numero: string; site: { idSite: number } }): Observable<TerrainModel> {
+    return this.http.post<TerrainModel>(this.apiUrl, terrain);
+  }
 }

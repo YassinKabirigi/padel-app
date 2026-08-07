@@ -1,1 +1,8 @@
+@if (auth.isAuthenticated()) {
+  <nav style="padding: 1rem; background: #f0f0f0; margin-bottom: 1rem;">
+    <a routerLink="/reservation" style="margin-right: 1rem;">Réservation</a>
+    <a routerLink="/admin">Administration</a>
+  </nav>
+}
+
 <router-outlet></router-outlet>

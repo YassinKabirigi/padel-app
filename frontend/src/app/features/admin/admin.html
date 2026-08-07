@@ -1,0 +1,51 @@
+<div style="max-width: 800px; margin: 2rem auto; padding: 1rem;">
+  <h2>Administration</h2>
+
+  @if (erreur) {
+    <p style="color: red;">{{ erreur }}</p>
+  }
+  @if (succes) {
+    <p style="color: green;">{{ succes }}</p>
+  }
+
+  <section style="margin-bottom: 2rem; padding: 1rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3>Sites</h3>
+
+    <ul>
+      @for (site of sites; track site.idSite) {
+        <li>{{ site.nom }} — {{ site.adresse }} ({{ site.heureOuverture }} - {{ site.heureFermeture }})</li>
+      }
+    </ul>
+
+    <h4>Créer un site</h4>
+    <form (ngSubmit)="creerSite()">
+      <input [(ngModel)]="nouveauSiteNom" name="nom" placeholder="Nom" style="margin-bottom: 0.5rem; display: block; width: 100%; padding: 0.5rem;" />
+      <input [(ngModel)]="nouveauSiteAdresse" name="adresse" placeholder="Adresse" style="margin-bottom: 0.5rem; display: block; width: 100%; padding: 0.5rem;" />
+      <label>Ouverture <input type="time" [(ngModel)]="nouveauSiteOuverture" name="ouverture" /></label>
+      <label style="margin-left: 1rem;">Fermeture <input type="time" [(ngModel)]="nouveauSiteFermeture" name="fermeture" /></label>
+      <button type="submit" style="display: block; margin-top: 0.5rem; padding: 0.5rem 1rem;">Créer le site</button>
+    </form>
+  </section>
+
+  <section style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3>Terrains</h3>
+
+    <ul>
+      @for (terrain of terrains; track terrain.idTerrain) {
+        <li>{{ terrain.site.nom }} — {{ terrain.numero }}</li>
+      }
+    </ul>
+
+    <h4>Créer un terrain</h4>
+    <form (ngSubmit)="creerTerrain()">
+      <input [(ngModel)]="nouveauTerrainNumero" name="numero" placeholder="Numéro (ex: Terrain 3)" style="margin-bottom: 0.5rem; display: block; width: 100%; padding: 0.5rem;" />
+      <select [(ngModel)]="nouveauTerrainSiteId" name="siteId" style="margin-bottom: 0.5rem; display: block; width: 100%; padding: 0.5rem;">
+        <option [ngValue]="null">-- Choisir un site --</option>
+        @for (site of sites; track site.idSite) {
+          <option [ngValue]="site.idSite">{{ site.nom }}</option>
+        }
+      </select>
+      <button type="submit" style="padding: 0.5rem 1rem;">Créer le terrain</button>
+    </form>
+  </section>
+</div>
