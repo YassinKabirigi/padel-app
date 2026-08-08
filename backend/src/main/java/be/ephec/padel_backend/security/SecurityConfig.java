@@ -3,6 +3,7 @@ package be.ephec.padel_backend.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -36,6 +37,13 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sites/**", "/api/terrains/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/sites/**", "/api/terrains/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
+                        .requestMatchers(HttpMethod.PUT, "/api/sites/**", "/api/terrains/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/sites/**", "/api/terrains/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
+                        .requestMatchers("/api/membres/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
+                        .requestMatchers("/api/administrateurs/**").hasAuthority("ROLE_ADMIN_GLOBAL")
+                        .requestMatchers("/api/matches/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
