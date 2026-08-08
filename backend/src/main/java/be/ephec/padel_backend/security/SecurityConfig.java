@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/sites/**", "/api/terrains/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/sites/**", "/api/terrains/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
                         .requestMatchers(HttpMethod.PUT, "/api/sites/**", "/api/terrains/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")

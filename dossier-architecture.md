@@ -69,6 +69,10 @@ Voir `analyse-mcd.md` pour le MCD, le MLD complet, les justifications de modéli
 - Frontend : 13 tests unitaires (services, guard, interceptor, composants)
 - E2E : 1 test Cypress du parcours principal (connexion → réservation), isolé via date/heure aléatoires pour être rejouable sans conflit
 
+## API — Documentation OpenAPI/Swagger
+
+Une fois le backend démarré : http://localhost:8080/swagger-ui.html
+
 ## Documentation complémentaire
 
 - `document-exploitation.md` : instructions de démarrage, prérequis, commandes
