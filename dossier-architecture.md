@@ -73,6 +73,22 @@ Voir `analyse-mcd.md` pour le MCD, le MLD complet, les justifications de modéli
 
 Une fois le backend démarré : http://localhost:8080/swagger-ui.html
 
+## Sécurité par rôles
+
+Deux familles de rôles : Membre (GLOBAL/SITE/LIBRE) et Administrateur
+(ADMIN_GLOBAL/ADMIN_SITE), tous deux authentifiés via JWT. Les opérations
+de gestion (sites, terrains, membres, administrateurs, consultation des
+réservations) sont réservées aux rôles ADMIN_*, vérifié au niveau de
+SecurityConfig via hasAnyAuthority()/hasAuthority() par route et méthode
+HTTP.
+
+## Tests
+
+- Backend : 12 tests unitaires + 2 tests d'intégration (@SpringBootTest,
+  base de données réelle)
+- Frontend : 13 tests unitaires
+- E2E : 1 test Cypress isolé (parcours complet)
+
 ## Documentation complémentaire
 
 - `document-exploitation.md` : instructions de démarrage, prérequis, commandes
