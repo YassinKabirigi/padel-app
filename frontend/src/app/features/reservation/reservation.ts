@@ -83,7 +83,7 @@ export class Reservation implements OnInit {
         error: (err) => {
           this.chargement = false;
           if (err.status === 400) {
-            this.erreur = err.error || 'Réservation refusée';
+            this.erreur = err.error?.erreur || 'Réservation refusée';
           } else {
             this.erreur = 'Erreur serveur';
           }

@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { Router, RouterOutlet, RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,5 +14,10 @@ import { Auth } from './core/services/auth';
 export class App {
   protected readonly title = signal('padel-frontend');
 
-  constructor(public auth: Auth) {}
+  constructor(public auth: Auth, private router: Router) {}
+
+  onLogout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
 }

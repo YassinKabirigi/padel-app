@@ -19,20 +19,14 @@ public class MatchController {
     }
 
     @PostMapping
-    public ResponseEntity<?> creerMatch(@RequestBody CreerMatchRequest request) {
-        try {
-            Match.Statut statut = Match.Statut.valueOf(request.getStatut());
-            Match match = reservationService.creerMatch(
-                    request.getIdTerrain(),
-                    request.getDateHeureDebut(),
-                    statut,
-                    request.getMatriculeOrganisateur()
-            );
-            return ResponseEntity.status(201).body(match);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Statut invalide (PRIVE ou PUBLIC attendu)");
-        }
+    public ResponseEntity<Match> creerMatch(@RequestBody CreerMatchRequest request) {
+        Match.Statut statut = Match.Statut.valueOf(request.getStatut());
+        Match match = reservationService.creerMatch(
+                request.getIdTerrain(),
+                request.getDateHeureDebut(),
+                statut,
+                request.getMatriculeOrganisateur()
+        );
+        return ResponseEntity.status(201).body(match);
     }
 }
