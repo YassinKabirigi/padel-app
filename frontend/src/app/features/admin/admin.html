@@ -129,4 +129,38 @@
       </form>
     </mat-card-content>
   </mat-card>
+
+  <mat-card style="margin-top: 2rem;">
+    <mat-card-header>
+      <mat-card-title>Réservations</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+        <tr style="text-align: left; border-bottom: 2px solid #ddd;">
+          <th style="padding: 0.5rem;">Membre</th>
+          <th style="padding: 0.5rem;">Match</th>
+          <th style="padding: 0.5rem;">Terrain</th>
+          <th style="padding: 0.5rem;">Statut</th>
+          <th style="padding: 0.5rem;">Organisateur</th>
+          <th style="padding: 0.5rem;">Paiement</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (p of participations; track p.idParticipation) {
+            <tr style="border-bottom: 1px solid #eee;">
+              <td style="padding: 0.5rem;">{{ p.matriculeMembre }} — {{ p.nomMembre }}</td>
+              <td style="padding: 0.5rem;">{{ p.dateMatch | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td style="padding: 0.5rem;">{{ p.siteNom }} — {{ p.terrainNumero }}</td>
+              <td style="padding: 0.5rem;">{{ p.statutMatch }}</td>
+              <td style="padding: 0.5rem;">{{ p.estOrganisateur ? 'Oui' : 'Non' }}</td>
+              <td style="padding: 0.5rem;" [style.color]="p.aPaye ? '#2e7d32' : '#c62828'">
+                {{ p.aPaye ? p.montantPaye : 'Non payé' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </mat-card-content>
+  </mat-card>
 </div>

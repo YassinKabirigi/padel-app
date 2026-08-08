@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Site, SiteModel } from '../../core/services/site';
 import { Terrain, TerrainModel } from '../../core/services/terrain';
 import { Membre, MembreModel } from '../../core/services/membre';
+import { Participation, ParticipationDetailModel } from '../../core/services/participation';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +21,7 @@ export class Admin implements OnInit {
   sites: SiteModel[] = [];
   terrains: TerrainModel[] = [];
   membres: MembreModel[] = [];
+  participations: ParticipationDetailModel[] = [];
 
   nouveauSiteNom = '';
   nouveauSiteAdresse = '';
@@ -43,6 +45,7 @@ export class Admin implements OnInit {
     private siteService: Site,
     private terrainService: Terrain,
     private membreService: Membre,
+    private participationService: Participation,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -59,6 +62,9 @@ export class Admin implements OnInit {
     });
     this.membreService.getAllMembres().subscribe({
       next: (data) => { this.membres = data; this.cdr.detectChanges(); }
+    });
+    this.participationService.getAllParticipations().subscribe({
+      next: (data) => { this.participations = data; this.cdr.detectChanges(); }
     });
   }
 
