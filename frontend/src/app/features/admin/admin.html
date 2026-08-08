@@ -59,6 +59,7 @@
           <input matInput [(ngModel)]="nouveauTerrainNumero" name="numero" placeholder="Ex: Terrain 3" />
         </mat-form-field>
 
+
         <mat-form-field appearance="outline" style="width: 100%;">
           <mat-label>Site</mat-label>
           <mat-select [(ngModel)]="nouveauTerrainSiteId" name="siteId">
@@ -69,6 +70,62 @@
         </mat-form-field>
 
         <button mat-raised-button color="primary" type="submit">Créer le terrain</button>
+      </form>
+
+    </mat-card-content>
+  </mat-card>
+  <mat-card style="margin-top: 2rem;">
+    <mat-card-header>
+      <mat-card-title>Membres</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @for (membre of membres; track membre.matricule) {
+        <p>{{ membre.matricule }} — {{ membre.prenom }} {{ membre.nom }} ({{ membre.typeMembre }})</p>
+      }
+
+      <h4>Créer un membre</h4>
+      <form (ngSubmit)="creerMembre()">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Nom</mat-label>
+          <input matInput [(ngModel)]="nouveauMembreNom" name="membreNom" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Prénom</mat-label>
+          <input matInput [(ngModel)]="nouveauMembrePrenom" name="membrePrenom" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Email</mat-label>
+          <input matInput [(ngModel)]="nouveauMembreEmail" name="membreEmail" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Téléphone</mat-label>
+          <input matInput [(ngModel)]="nouveauMembreTelephone" name="membreTelephone" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Type de membre</mat-label>
+          <mat-select [(ngModel)]="nouveauMembreType" name="membreType">
+            <mat-option value="GLOBAL">Global</mat-option>
+            <mat-option value="SITE">Site</mat-option>
+            <mat-option value="LIBRE">Libre</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        @if (nouveauMembreType === 'SITE') {
+          <mat-form-field appearance="outline" style="width: 100%;">
+            <mat-label>Site de rattachement</mat-label>
+            <mat-select [(ngModel)]="nouveauMembreSiteId" name="membreSiteId">
+              @for (site of sites; track site.idSite) {
+                <mat-option [value]="site.idSite">{{ site.nom }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        <button mat-raised-button color="primary" type="submit">Créer le membre</button>
       </form>
     </mat-card-content>
   </mat-card>

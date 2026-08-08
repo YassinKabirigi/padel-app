@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Site, SiteModel } from '../../core/services/site';
 import { Terrain, TerrainModel } from '../../core/services/terrain';
+import { Membre, MembreModel } from '../../core/services/membre';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -18,16 +19,22 @@ import { MatButtonModule } from '@angular/material/button';
 export class Admin implements OnInit {
   sites: SiteModel[] = [];
   terrains: TerrainModel[] = [];
+  membres: MembreModel[] = [];
 
-  // Formulaire nouveau site
   nouveauSiteNom = '';
   nouveauSiteAdresse = '';
   nouveauSiteOuverture = '08:00';
   nouveauSiteFermeture = '22:00';
 
-  // Formulaire nouveau terrain
   nouveauTerrainNumero = '';
   nouveauTerrainSiteId: number | null = null;
+
+  nouveauMembreNom = '';
+  nouveauMembrePrenom = '';
+  nouveauMembreEmail = '';
+  nouveauMembreTelephone = '';
+  nouveauMembreType = 'GLOBAL';
+  nouveauMembreSiteId: number | null = null;
 
   erreur = '';
   succes = '';
@@ -35,6 +42,7 @@ export class Admin implements OnInit {
   constructor(
     private siteService: Site,
     private terrainService: Terrain,
+    private membreService: Membre,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -44,16 +52,13 @@ export class Admin implements OnInit {
 
   chargerDonnees(): void {
     this.siteService.getAllSites().subscribe({
-      next: (data) => {
-        this.sites = data;
-        this.cdr.detectChanges();
-      }
+      next: (data) => { this.sites = data; this.cdr.detectChanges(); }
     });
     this.terrainService.getAllTerrains().subscribe({
-      next: (data) => {
-        this.terrains = data;
-        this.cdr.detectChanges();
-      }
+      next: (data) => { this.terrains = data; this.cdr.detectChanges(); }
+    });
+    this.membreService.getAllMembres().subscribe({
+      next: (data) => { this.membres = data; this.cdr.detectChanges(); }
     });
   }
 
@@ -83,7 +88,7 @@ export class Admin implements OnInit {
           this.cdr.detectChanges();
         },
         error: () => {
-          this.erreur = 'Erreur lors de la création du site';
+          this.erreur = 'Erreur lors de la création du site (droits insuffisants ?)';
           this.cdr.detectChanges();
         }
       });
@@ -112,9 +117,57 @@ export class Admin implements OnInit {
           this.cdr.detectChanges();
         },
         error: () => {
-          this.erreur = 'Erreur lors de la création du terrain';
+          this.erreur = 'Erreur lors de la création du terrain (droits insuffisants ?)';
           this.cdr.detectChanges();
         }
       });
+  }
+
+  creerMembre(): void {
+    this.erreur = '';
+    this.succes = '';
+
+    if (!this.nouveauMembreNom || !this.nouveauMembrePrenom || !this.nouveauMembreEmail) {
+      this.erreur = 'Veuillez remplir tous les champs obligatoires';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.nouveauMembreType === 'SITE' && !this.nouveauMembreSiteId) {
+      this.erreur = 'Veuillez sélectionner un site pour un membre de type Site';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const prefixe = this.nouveauMembreType === 'GLOBAL' ? 'G'
+      : this.nouveauMembreType === 'SITE' ? 'S' : 'L';
+    const matricule = prefixe + Math.floor(1000 + Math.random() * 9000);
+
+    const nouveauMembre: MembreModel = {
+      matricule,
+      nom: this.nouveauMembreNom,
+      prenom: this.nouveauMembrePrenom,
+      email: this.nouveauMembreEmail,
+      telephone: this.nouveauMembreTelephone,
+      dateInscription: new Date().toISOString().split('T')[0],
+      typeMembre: this.nouveauMembreType,
+      site: this.nouveauMembreType === 'SITE' ? { idSite: this.nouveauMembreSiteId! } : null
+    };
+
+    this.membreService.createMembre(nouveauMembre).subscribe({
+      next: () => {
+        this.succes = `Membre créé avec succès (matricule : ${matricule})`;
+        this.nouveauMembreNom = '';
+        this.nouveauMembrePrenom = '';
+        this.nouveauMembreEmail = '';
+        this.nouveauMembreTelephone = '';
+        this.chargerDonnees();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.erreur = 'Erreur lors de la création du membre (droits insuffisants ?)';
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
