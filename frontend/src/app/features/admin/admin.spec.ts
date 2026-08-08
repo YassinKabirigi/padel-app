@@ -1,22 +1,17 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Admin } from './admin';
 
 describe('Admin', () => {
-  let component: Admin;
-  let fixture: ComponentFixture<Admin>;
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Admin],
+      imports: [Admin, HttpClientTestingModule],
     }).compileComponents();
-
-    fixture = TestBed.createComponent(Admin);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = TestBed.createComponent(Admin);
+    const admin = fixture.componentInstance;
+    expect(admin).toBeTruthy();
   });
 });
