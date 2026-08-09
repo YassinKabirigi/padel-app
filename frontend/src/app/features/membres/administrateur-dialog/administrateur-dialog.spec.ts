@@ -1,22 +1,20 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TestBed } from '@angular/core/testing';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AdministrateurDialog } from './administrateur-dialog';
 
 describe('AdministrateurDialog', () => {
-  let component: AdministrateurDialog;
-  let fixture: ComponentFixture<AdministrateurDialog>;
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AdministrateurDialog],
+      providers: [
+        { provide: MatDialogRef, useValue: { close: () => {} } },
+        { provide: MAT_DIALOG_DATA, useValue: { admin: null, sites: [] } }
+      ]
     }).compileComponents();
-
-    fixture = TestBed.createComponent(AdministrateurDialog);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = TestBed.createComponent(AdministrateurDialog);
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

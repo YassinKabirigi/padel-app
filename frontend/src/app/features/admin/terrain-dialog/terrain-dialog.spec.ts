@@ -1,22 +1,20 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TestBed } from '@angular/core/testing';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TerrainDialog } from './terrain-dialog';
 
 describe('TerrainDialog', () => {
-  let component: TerrainDialog;
-  let fixture: ComponentFixture<TerrainDialog>;
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TerrainDialog],
+      providers: [
+        { provide: MatDialogRef, useValue: { close: () => {} } },
+        { provide: MAT_DIALOG_DATA, useValue: { terrain: null, sites: [] } }
+      ]
     }).compileComponents();
-
-    fixture = TestBed.createComponent(TerrainDialog);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = TestBed.createComponent(TerrainDialog);
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

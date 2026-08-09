@@ -89,6 +89,37 @@ HTTP.
 - Frontend : 13 tests unitaires
 - E2E : 1 test Cypress isolé (parcours complet)
 
+## Refonte UX (09/08/2026) — "Padel Manager"
+
+Suite à la remise initiale, une refonte visuelle complète a été réalisée :
+
+### Nouvelles pages/fonctionnalités
+- Dashboard personnel (`/dashboard`) : profil, paiements (avec historique et paiement en ligne),
+  statistiques (tuiles KPI), réservations — organisé en onglets Material
+- Page Membres/Administrateurs (`/membres`, accès admin uniquement) : gestion complète
+  (CRUD), organisée en onglets (Membres / Administrateurs / Pénalités)
+- Page Administration (`/admin`) : dashboard KPI (5 compteurs), onglets
+  (Sites & Terrains / Réservations / Jours de fermeture)
+
+### Nouveaux endpoints backend (extensions non-invasives de l'existant)
+- `GET /api/membres/me` + `/paiements` + `/stats` + `/historique-paiements` :
+  données personnelles du membre connecté
+- `POST /api/membres/me/payer/{idParticipation}` : paiement d'une participation
+  (expose PaiementService.effectuerPaiement, déjà existant)
+- `GET/POST/PUT/DELETE /api/jours-fermeture` : gestion des fermetures de site
+  (expose la logique déjà vérifiée par ReservationService.isSiteOuvert())
+- `GET/DELETE /api/penalites` : consultation et levée manuelle des pénalités actives
+
+### Composants réutilisables
+- `shared/badge` : composant badge unique centralisant les couleurs pour tous les
+  statuts (types de membre, PRIVÉ/PUBLIC, PAYÉ/NON PAYÉ, ORGANISATEUR)
+- Pattern dialog Material généralisé pour toutes les créations/modifications
+  (Site, Terrain, Membre, Administrateur, Jour de fermeture)
+
+### Design
+Thème sombre (palette violet/cyan), toolbar contrastée (vert), layouts multi-colonnes
+avec breakpoints responsive (700px, 900px, 1100px), navbar mobile empilée en colonne.
+
 ## Documentation complémentaire
 
 - `document-exploitation.md` : instructions de démarrage, prérequis, commandes

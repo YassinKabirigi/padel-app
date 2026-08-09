@@ -1,22 +1,20 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TestBed } from '@angular/core/testing';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MembreDialog } from './membre-dialog';
 
 describe('MembreDialog', () => {
-  let component: MembreDialog;
-  let fixture: ComponentFixture<MembreDialog>;
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MembreDialog],
+      providers: [
+        { provide: MatDialogRef, useValue: { close: () => {} } },
+        { provide: MAT_DIALOG_DATA, useValue: { membre: null, sites: [] } }
+      ]
     }).compileComponents();
-
-    fixture = TestBed.createComponent(MembreDialog);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = TestBed.createComponent(MembreDialog);
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });
