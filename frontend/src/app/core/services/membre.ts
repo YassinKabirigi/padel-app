@@ -28,4 +28,12 @@ export class Membre {
   createMembre(membre: MembreModel): Observable<MembreModel> {
     return this.http.post<MembreModel>(this.apiUrl, membre);
   }
+
+  updateMembre(matricule: string, membre: Partial<MembreModel>): Observable<MembreModel> {
+    return this.http.put<MembreModel>(`${this.apiUrl}/${matricule}`, membre);
+  }
+
+  deleteMembre(matricule: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${matricule}`);
+  }
 }

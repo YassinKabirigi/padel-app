@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>{{ data.terrain ? 'Modifier le terrain' : 'Nouveau terrain' }}</h2>
+
+<mat-dialog-content>
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Numéro</mat-label>
+    <input matInput [(ngModel)]="numero" name="numero" placeholder="Ex: Terrain 3" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Site</mat-label>
+    <mat-select [(ngModel)]="siteId" name="siteId">
+      @for (site of data.sites; track site.idSite) {
+        <mat-option [value]="site.idSite">{{ site.nom }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onAnnuler()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="onValider()">Valider</button>
+</mat-dialog-actions>

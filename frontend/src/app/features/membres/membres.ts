@@ -10,10 +10,24 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MembreDialog } from './membre-dialog/membre-dialog';
 
 @Component({
   selector: 'app-membres',
-  imports: [CommonModule, FormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatChipsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatDialogModule,
+    MatIconModule
+  ],
   templateUrl: './membres.html',
   styleUrl: './membres.scss'
 })
@@ -42,6 +56,7 @@ export class Membres implements OnInit {
     private siteService: Site,
     private membreService: Membre,
     private administrateurService: Administrateur,
+    private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -84,6 +99,8 @@ export class Membres implements OnInit {
     }
   }
 
+  // ----- Membres -----
+
   creerMembre(): void {
     if (!this.nouveauMembreNom || !this.nouveauMembrePrenom || !this.nouveauMembreEmail) {
       this.afficherErreur('Veuillez remplir tous les champs obligatoires');
@@ -123,6 +140,51 @@ export class Membres implements OnInit {
       }
     });
   }
+
+  ouvrirDialogModifierMembre(membre: MembreModel): void {
+    const dialogRef = this.dialog.open(MembreDialog, {
+      width: '450px',
+      data: { membre, sites: this.sites }
+    });
+
+    dialogRef.afterClosed().subscribe((resultat) => {
+      if (!resultat) {
+        return;
+      }
+
+      this.membreService.updateMembre(membre.matricule, resultat).subscribe({
+        next: () => {
+          this.afficherSucces('Membre modifié avec succès');
+          this.chargerDonnees();
+        },
+        error: (err) => {
+          this.afficherErreur(err.error?.erreur || 'Erreur lors de la modification');
+        }
+      });
+    });
+  }
+
+  supprimerMembre(matricule: string): void {
+    if (!confirm('Confirmer la suppression de ce membre ?')) {
+      return;
+    }
+    this.membreService.deleteMembre(matricule).subscribe({
+      next: () => {
+        this.afficherSucces('Membre supprimé');
+        this.chargerDonnees();
+      },
+      error: (err) => {
+        if (err.status === 409) {
+          this.afficherErreur(err.error?.erreur || 'Impossible de supprimer : élément encore référencé');
+        } else {
+          this.afficherErreur('Erreur lors de la suppression');
+        }
+        this.chargerDonnees();
+      }
+    });
+  }
+
+  // ----- Administrateurs -----
 
   creerAdministrateur(): void {
     if (!this.nouveauAdminNom || !this.nouveauAdminPrenom || !this.nouveauAdminEmail) {

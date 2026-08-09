@@ -12,16 +12,22 @@
     </mat-card-header>
     <mat-card-content>
       @for (membre of membres; track membre.matricule) {
-        <p>
-          {{ membre.matricule }} — {{ membre.prenom }} {{ membre.nom }}
-          <span [style.background]="couleurBadge(membre.typeMembre)"
-                style="padding: 0.15rem 0.5rem; border-radius: 10px; color: white; font-size: 0.75rem; margin-left: 0.5rem;">
-            {{ membre.typeMembre }}
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #333;">
+          <span>
+            {{ membre.matricule }} — {{ membre.prenom }} {{ membre.nom }}
+            <span [style.background]="couleurBadge(membre.typeMembre)"
+                  style="padding: 0.15rem 0.5rem; border-radius: 10px; color: white; font-size: 0.75rem; margin-left: 0.5rem;">
+              {{ membre.typeMembre }}
+            </span>
           </span>
-        </p>
+          <span>
+            <button mat-icon-button (click)="ouvrirDialogModifierMembre(membre)"><mat-icon>edit</mat-icon></button>
+            <button mat-icon-button color="warn" (click)="supprimerMembre(membre.matricule)"><mat-icon>delete</mat-icon></button>
+          </span>
+        </div>
       }
 
-      <h4>Créer un membre</h4>
+      <h4 style="margin-top: 1.5rem;">Créer un membre</h4>
       <form (ngSubmit)="creerMembre()">
         <mat-form-field appearance="outline" style="width: 100%;">
           <mat-label>Nom</mat-label>

@@ -47,4 +47,14 @@ public class TerrainController {
         terrainService.deleteTerrain(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Terrain> updateTerrain(@PathVariable Integer id, @RequestBody Terrain terrain) {
+        try {
+            Terrain updated = terrainService.updateTerrain(id, terrain);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

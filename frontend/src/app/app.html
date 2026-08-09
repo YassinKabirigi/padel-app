@@ -1,23 +1,23 @@
 @if (auth.isAuthenticated()) {
-  <mat-toolbar color="primary" style="flex-wrap: wrap;">
+  <mat-toolbar style="flex-wrap: wrap; background: #4527a0; color: #fff;">
     <mat-icon>sports_tennis</mat-icon>
     <span style="margin-left: 0.5rem;">Padel Manager</span>
     <span style="flex: 1 1 auto;"></span>
-    <a mat-button routerLink="/dashboard">
+    <a mat-button routerLink="/dashboard" style="color: #fff;">
       <mat-icon>dashboard</mat-icon> Dashboard
     </a>
-    <a mat-button routerLink="/reservation">
+    <a mat-button routerLink="/reservation" style="color: #fff;">
       <mat-icon>event</mat-icon> Réservation
     </a>
     @if (estAdmin()) {
-      <a mat-button routerLink="/admin">
+      <a mat-button routerLink="/admin" style="color: #fff;">
         <mat-icon>settings</mat-icon> Terrains
       </a>
-      <a mat-button routerLink="/membres">
+      <a mat-button routerLink="/membres" style="color: #fff;">
         <mat-icon>people</mat-icon> Membres
       </a>
     }
-    <button mat-button (click)="onLogout()">
+    <button mat-button (click)="onLogout()" style="color: #fff;">
       <mat-icon>logout</mat-icon> Déconnexion
     </button>
   </mat-toolbar>

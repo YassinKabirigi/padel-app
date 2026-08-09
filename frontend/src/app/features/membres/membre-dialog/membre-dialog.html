@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Modifier le membre</h2>
+
+<mat-dialog-content>
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Nom</mat-label>
+    <input matInput [(ngModel)]="nom" name="nom" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Prénom</mat-label>
+    <input matInput [(ngModel)]="prenom" name="prenom" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Email</mat-label>
+    <input matInput [(ngModel)]="email" name="email" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Téléphone</mat-label>
+    <input matInput [(ngModel)]="telephone" name="telephone" />
+  </mat-form-field>
+
+  <p style="color: #999; font-size: 0.85rem;">Le type de membre ({{ typeMembre }}) ne peut pas être modifié (lié au préfixe du matricule).</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onAnnuler()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="onValider()">Valider</button>
+</mat-dialog-actions>

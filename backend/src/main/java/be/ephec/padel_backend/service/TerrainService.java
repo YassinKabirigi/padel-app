@@ -37,4 +37,12 @@ public class TerrainService {
     public void deleteTerrain(Integer id) {
         terrainRepository.deleteById(id);
     }
+
+    public Terrain updateTerrain(Integer id, Terrain terrainDetails) {
+        Terrain terrain = terrainRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Terrain introuvable avec id " + id));
+        terrain.setNumero(terrainDetails.getNumero());
+        terrain.setSite(terrainDetails.getSite());
+        return terrainRepository.save(terrain);
+    }
 }

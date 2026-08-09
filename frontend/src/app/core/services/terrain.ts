@@ -25,4 +25,12 @@ export class Terrain {
   createTerrain(terrain: { numero: string; site: { idSite: number } }): Observable<TerrainModel> {
     return this.http.post<TerrainModel>(this.apiUrl, terrain);
   }
+
+  deleteTerrain(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  updateTerrain(id: number, terrain: { numero: string; site: { idSite: number } }): Observable<TerrainModel> {
+    return this.http.put<TerrainModel>(`${this.apiUrl}/${id}`, terrain);
+  }
 }

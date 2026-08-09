@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { SiteDialog } from './site-dialog/site-dialog';
+import { TerrainDialog } from './terrain-dialog/terrain-dialog';
 
 @Component({
   selector: 'app-admin',
@@ -33,9 +34,6 @@ export class Admin implements OnInit {
   sites: SiteModel[] = [];
   terrains: TerrainModel[] = [];
   participations: ParticipationDetailModel[] = [];
-
-  nouveauTerrainNumero = '';
-  nouveauTerrainSiteId: number | null = null;
 
   erreur = '';
   succes = '';
@@ -139,26 +137,50 @@ export class Admin implements OnInit {
 
   // ----- Terrains -----
 
-  creerTerrain(): void {
-    if (!this.nouveauTerrainNumero || !this.nouveauTerrainSiteId) {
-      this.afficherErreur('Veuillez remplir le numéro et sélectionner un site');
-      return;
-    }
+  ouvrirDialogTerrain(terrain: TerrainModel | null): void {
+    const dialogRef = this.dialog.open(TerrainDialog, {
+      width: '450px',
+      data: { terrain, sites: this.sites }
+    });
 
-    this.terrainService
-      .createTerrain({
-        numero: this.nouveauTerrainNumero,
-        site: { idSite: this.nouveauTerrainSiteId }
-      })
-      .subscribe({
+    dialogRef.afterClosed().subscribe((resultat) => {
+      if (!resultat) {
+        return;
+      }
+
+      const operation = terrain
+        ? this.terrainService.updateTerrain(terrain.idTerrain, resultat)
+        : this.terrainService.createTerrain(resultat);
+
+      operation.subscribe({
         next: () => {
-          this.afficherSucces('Terrain créé avec succès');
-          this.nouveauTerrainNumero = '';
+          this.afficherSucces(terrain ? 'Terrain modifié avec succès' : 'Terrain créé avec succès');
           this.chargerDonnees();
         },
-        error: () => {
-          this.afficherErreur('Erreur lors de la création du terrain (droits insuffisants ?)');
+        error: (err) => {
+          this.afficherErreur(err.error?.erreur || 'Erreur lors de l\'opération');
         }
       });
+    });
+  }
+
+  supprimerTerrain(id: number): void {
+    if (!confirm('Confirmer la suppression de ce terrain ?')) {
+      return;
+    }
+    this.terrainService.deleteTerrain(id).subscribe({
+      next: () => {
+        this.afficherSucces('Terrain supprimé');
+        this.chargerDonnees();
+      },
+      error: (err) => {
+        if (err.status === 409) {
+          this.afficherErreur(err.error?.erreur || 'Impossible de supprimer : élément encore référencé');
+        } else {
+          this.afficherErreur('Erreur lors de la suppression');
+        }
+        this.chargerDonnees();
+      }
+    });
   }
 }
