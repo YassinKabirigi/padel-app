@@ -9,13 +9,14 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 import { Badge } from '../../shared/badge/badge';
 import { MembreDialog } from './membre-dialog/membre-dialog';
 import { AdministrateurDialog } from './administrateur-dialog/administrateur-dialog';
 
 @Component({
   selector: 'app-membres',
-  imports: [CommonModule, FormsModule, MatCardModule, MatButtonModule, MatDialogModule, MatIconModule, Badge],
+  imports: [CommonModule, FormsModule, MatCardModule, MatButtonModule, MatDialogModule, MatIconModule, MatTabsModule, Badge],
   templateUrl: './membres.html',
   styleUrl: './membres.scss'
 })
@@ -69,8 +70,6 @@ export class Membres implements OnInit {
       next: (data) => { this.penalites = data; this.cdr.detectChanges(); }
     });
   }
-
-  // ----- Membres -----
 
   ouvrirDialogMembre(membre: MembreModel | null): void {
     const dialogRef = this.dialog.open(MembreDialog, {
@@ -142,8 +141,6 @@ export class Membres implements OnInit {
     });
   }
 
-  // ----- Administrateurs -----
-
   ouvrirDialogAdministrateur(admin: AdministrateurModel | null): void {
     const dialogRef = this.dialog.open(AdministrateurDialog, {
       width: '450px',
@@ -194,8 +191,6 @@ export class Membres implements OnInit {
       }
     });
   }
-
-  // ----- Pénalités -----
 
   leverPenalite(matricule: string): void {
     if (!confirm('Confirmer la levée de cette pénalité ?')) {
