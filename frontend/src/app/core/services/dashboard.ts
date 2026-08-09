@@ -25,6 +25,17 @@ export interface MesStatistiquesModel {
   matchsPublics: number;
 }
 
+export interface HistoriquePaiementModel {
+  idParticipation: number;
+  idPaiement: number | null;
+  montant: number;
+  datePaiement: string | null;
+  terrainNumero: string;
+  siteNom: string;
+  dateMatch: string;
+  statutMatch: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -47,5 +58,13 @@ export class Dashboard {
 
   getMesReservations(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/participations/me`);
+  }
+
+  getHistoriquePaiements(): Observable<HistoriquePaiementModel[]> {
+    return this.http.get<HistoriquePaiementModel[]>(`${this.apiUrl}/membres/me/historique-paiements`);
+  }
+
+  payerParticipation(idParticipation: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/membres/me/payer/${idParticipation}`, {});
   }
 }

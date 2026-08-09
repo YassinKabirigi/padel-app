@@ -3,16 +3,18 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonModule } from '@angular/material/button';
 import {
   Dashboard as DashboardService,
   MonProfilModel,
   MesPaiementsModel,
-  MesStatistiquesModel
+  MesStatistiquesModel,
+  HistoriquePaiementModel
 } from '../../core/services/dashboard';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, MatCardModule, MatIconModule, MatChipsModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatChipsModule, MatButtonModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -21,10 +23,15 @@ export class DashboardComponent implements OnInit {
   paiements: MesPaiementsModel | null = null;
   stats: MesStatistiquesModel | null = null;
   reservations: any[] = [];
+  historiquePaiements: HistoriquePaiementModel[] = [];
 
   constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
+    this.chargerDonnees();
+  }
+
+  chargerDonnees(): void {
     this.dashboardService.getMonProfil().subscribe({
       next: (data) => { this.profil = data; this.cdr.detectChanges(); }
     });
@@ -37,6 +44,9 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.getMesReservations().subscribe({
       next: (data) => { this.reservations = data; this.cdr.detectChanges(); }
     });
+    this.dashboardService.getHistoriquePaiements().subscribe({
+      next: (data) => { this.historiquePaiements = data; this.cdr.detectChanges(); }
+    });
   }
 
   couleurBadge(type: string): string {
@@ -46,5 +56,16 @@ export class DashboardComponent implements OnInit {
       case 'LIBRE': return '#66bb6a';
       default: return '#888';
     }
+  }
+
+  payer(idParticipation: number): void {
+    this.dashboardService.payerParticipation(idParticipation).subscribe({
+      next: () => {
+        this.chargerDonnees();
+      },
+      error: () => {
+        alert('Erreur lors du paiement');
+      }
+    });
   }
 }

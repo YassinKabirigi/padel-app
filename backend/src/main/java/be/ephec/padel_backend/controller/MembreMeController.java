@@ -1,18 +1,24 @@
 package be.ephec.padel_backend.controller;
 
+import be.ephec.padel_backend.dto.HistoriquePaiementDto;
 import be.ephec.padel_backend.dto.MesPaiementsDto;
 import be.ephec.padel_backend.dto.MesStatistiquesDto;
 import be.ephec.padel_backend.dto.MonProfilDto;
 import be.ephec.padel_backend.entity.Administrateur;
 import be.ephec.padel_backend.entity.Membre;
+import be.ephec.padel_backend.entity.Paiement;
 import be.ephec.padel_backend.entity.Participation;
 import be.ephec.padel_backend.repository.AdministrateurRepository;
 import be.ephec.padel_backend.repository.MembreRepository;
+import be.ephec.padel_backend.repository.PaiementRepository;
 import be.ephec.padel_backend.repository.ParticipationRepository;
+import be.ephec.padel_backend.service.PaiementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,14 +35,20 @@ public class MembreMeController {
     private final MembreRepository membreRepository;
     private final AdministrateurRepository administrateurRepository;
     private final ParticipationRepository participationRepository;
+    private final PaiementService paiementService;
+    private final PaiementRepository paiementRepository;
 
     @Autowired
     public MembreMeController(MembreRepository membreRepository,
                               AdministrateurRepository administrateurRepository,
-                              ParticipationRepository participationRepository) {
+                              ParticipationRepository participationRepository,
+                              PaiementService paiementService,
+                              PaiementRepository paiementRepository) {
         this.membreRepository = membreRepository;
         this.administrateurRepository = administrateurRepository;
         this.participationRepository = participationRepository;
+        this.paiementService = paiementService;
+        this.paiementRepository = paiementRepository;
     }
 
     private boolean isAdministrateur(String identifiant) {
@@ -130,5 +142,68 @@ public class MembreMeController {
                 .count();
 
         return ResponseEntity.ok(new MesStatistiquesDto(matchsJoues, reservationsAVenir, matchsPrives, matchsPublics));
+    }
+
+    @GetMapping("/historique-paiements")
+    public ResponseEntity<List<HistoriquePaiementDto>> getHistoriquePaiements(Authentication authentication) {
+        String identifiant = authentication.getName();
+
+        if (isAdministrateur(identifiant)) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<Participation> mesParticipations = participationRepository.findAll().stream()
+                .filter(p -> p.getMembre().getMatricule().equals(identifiant))
+                .toList();
+
+        List<HistoriquePaiementDto> historique = mesParticipations.stream()
+                .map(p -> {
+                    Paiement paiement = p.getPaiement();
+                    BigDecimal montant = paiement != null ? paiement.getMontant() : PRIX_PAR_JOUEUR;
+                    LocalDateTime datePaiement = paiement != null ? paiement.getDatePaiement() : null;
+
+                    return new HistoriquePaiementDto(
+                            p.getIdParticipation(),
+                            paiement != null ? paiement.getIdPaiement() : null,
+                            montant,
+                            datePaiement,
+                            p.getMatch().getTerrain().getNumero(),
+                            p.getMatch().getTerrain().getSite().getNom(),
+                            p.getMatch().getDateHeureDebut(),
+                            p.getMatch().getStatut().name()
+                    );
+                })
+                .sorted((a, b) -> b.getDateMatch().compareTo(a.getDateMatch()))
+                .toList();
+
+        return ResponseEntity.ok(historique);
+    }
+
+    @PostMapping("/payer/{idParticipation}")
+    public ResponseEntity<?> payerParticipation(@PathVariable Integer idParticipation, Authentication authentication) {
+        String identifiant = authentication.getName();
+
+        if (isAdministrateur(identifiant)) {
+            return ResponseEntity.status(403).body("Les administrateurs ne peuvent pas effectuer de paiement");
+        }
+
+        Participation participation = participationRepository.findById(idParticipation)
+                .orElseThrow(() -> new IllegalStateException("Participation introuvable"));
+
+        if (!participation.getMembre().getMatricule().equals(identifiant)) {
+            return ResponseEntity.status(403).body("Vous ne pouvez payer que vos propres participations");
+        }
+
+        if (participation.getPaiement() != null) {
+            return ResponseEntity.status(409).body("Cette participation est déjà payée");
+        }
+
+        Paiement paiement = paiementService.effectuerPaiement(List.of(participation));
+        Paiement paiementSauvegarde = paiementRepository.save(paiement);
+
+        participation.setPaiement(paiementSauvegarde);
+        participationRepository.save(participation);
+
+        return ResponseEntity.ok().build();
     }
 }
