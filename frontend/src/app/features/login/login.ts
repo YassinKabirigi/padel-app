@@ -33,7 +33,7 @@ export class Login {
     this.authService.login(this.matricule).subscribe({
       next: () => {
         this.chargement = false;
-        this.router.navigate(['/reservation']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.chargement = false;

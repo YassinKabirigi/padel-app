@@ -1,13 +1,16 @@
 @if (auth.isAuthenticated()) {
   <mat-toolbar color="primary" style="flex-wrap: wrap;">
     <mat-icon>sports_tennis</mat-icon>
-    <span style="margin-left: 0.5rem;">Padel App</span>
+    <span style="margin-left: 0.5rem;">Padel Manager</span>
     <span style="flex: 1 1 auto;"></span>
+    <a mat-button routerLink="/dashboard">
+      <mat-icon>dashboard</mat-icon> Dashboard
+    </a>
     <a mat-button routerLink="/reservation">
       <mat-icon>event</mat-icon> Réservation
     </a>
     <a mat-button routerLink="/admin">
-      <mat-icon>settings</mat-icon> Administration
+      <mat-icon>settings</mat-icon> Terrains
     </a>
     <button mat-button (click)="onLogout()">
       <mat-icon>logout</mat-icon> Déconnexion
