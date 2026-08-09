@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Site, SiteModel } from '../../core/services/site';
 import { Membre, MembreModel } from '../../core/services/membre';
 import { Administrateur, AdministrateurModel } from '../../core/services/administrateur';
+import { Penalite, PenaliteModel } from '../../core/services/penalite';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -22,6 +23,7 @@ export class Membres implements OnInit {
   sites: SiteModel[] = [];
   membres: MembreModel[] = [];
   administrateurs: AdministrateurModel[] = [];
+  penalites: PenaliteModel[] = [];
 
   erreur = '';
   succes = '';
@@ -30,6 +32,7 @@ export class Membres implements OnInit {
     private siteService: Site,
     private membreService: Membre,
     private administrateurService: Administrateur,
+    private penaliteService: Penalite,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {}
@@ -61,6 +64,9 @@ export class Membres implements OnInit {
     });
     this.administrateurService.getAllAdministrateurs().subscribe({
       next: (data) => { this.administrateurs = data; this.cdr.detectChanges(); }
+    });
+    this.penaliteService.getPenalitesActives().subscribe({
+      next: (data) => { this.penalites = data; this.cdr.detectChanges(); }
     });
   }
 
@@ -185,6 +191,23 @@ export class Membres implements OnInit {
           this.afficherErreur('Erreur lors de la suppression (réservé aux administrateurs globaux)');
         }
         this.chargerDonnees();
+      }
+    });
+  }
+
+  // ----- Pénalités -----
+
+  leverPenalite(matricule: string): void {
+    if (!confirm('Confirmer la levée de cette pénalité ?')) {
+      return;
+    }
+    this.penaliteService.leverPenalite(matricule).subscribe({
+      next: () => {
+        this.afficherSucces('Pénalité levée avec succès');
+        this.chargerDonnees();
+      },
+      error: () => {
+        this.afficherErreur('Erreur lors de la levée de la pénalité');
       }
     });
   }

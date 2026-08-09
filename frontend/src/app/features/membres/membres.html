@@ -65,4 +65,27 @@
     </div>
 
   </div>
+
+  <div style="margin-top: 2rem;">
+    <h2 style="margin-bottom: 1rem;">⚠️ Pénalités actives</h2>
+
+    <mat-card>
+      <mat-card-content>
+        @for (p of penalites; track p.matricule) {
+          <div class="ligne-item">
+            <span>
+              {{ p.matricule }} — {{ p.prenom }} {{ p.nom }}
+              <span style="color: #999; font-size: 0.85rem; margin-left: 0.5rem;">
+                jusqu'au {{ p.dateFinPenalite | date:'dd/MM/yyyy' }} ({{ p.motifPenalite }})
+              </span>
+            </span>
+            <button mat-button color="primary" (click)="leverPenalite(p.matricule)">Lever la pénalité</button>
+          </div>
+        } @empty {
+          <p style="color: #999;">Aucune pénalité active pour l'instant.</p>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+
 </div>
