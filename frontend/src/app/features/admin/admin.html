@@ -6,6 +6,34 @@
     <p style="color: #66bb6a;">{{ succes }}</p>
   }
 
+  <div class="grille-kpi-admin">
+    <div class="tuile-kpi">
+      <mat-icon>location_on</mat-icon>
+      <p class="kpi-valeur">{{ sites.length }}</p>
+      <p class="kpi-label">Sites</p>
+    </div>
+    <div class="tuile-kpi">
+      <mat-icon>sports_tennis</mat-icon>
+      <p class="kpi-valeur">{{ terrains.length }}</p>
+      <p class="kpi-label">Terrains</p>
+    </div>
+    <div class="tuile-kpi">
+      <mat-icon>people</mat-icon>
+      <p class="kpi-valeur">{{ nbMembres }}</p>
+      <p class="kpi-label">Membres</p>
+    </div>
+    <div class="tuile-kpi">
+      <mat-icon>admin_panel_settings</mat-icon>
+      <p class="kpi-valeur">{{ nbAdministrateurs }}</p>
+      <p class="kpi-label">Administrateurs</p>
+    </div>
+    <div class="tuile-kpi">
+      <mat-icon>event</mat-icon>
+      <p class="kpi-valeur">{{ participations.length }}</p>
+      <p class="kpi-label">Réservations</p>
+    </div>
+  </div>
+
   <div class="layout-admin-3col">
 
     <div>
@@ -20,9 +48,9 @@
         @for (site of sites; track site.idSite) {
           <mat-card>
             <mat-card-content>
-              <h3 style="margin-top: 0;">{{ site.nom }}</h3>
-              <p style="color: #999; margin: 0.25rem 0;">{{ site.adresse }}</p>
-              <p style="color: #999; margin: 0.25rem 0;">{{ site.heureOuverture }} - {{ site.heureFermeture }}</p>
+              <h3 style="margin-top: 0;">🎾 {{ site.nom }}</h3>
+              <p style="color: #999; margin: 0.25rem 0;">📍 {{ site.adresse }}</p>
+              <p style="color: #999; margin: 0.25rem 0;">🕐 {{ site.heureOuverture }} - {{ site.heureFermeture }}</p>
             </mat-card-content>
             <mat-card-actions>
               <button mat-button (click)="ouvrirDialogSite(site)">Modifier</button>
@@ -45,8 +73,8 @@
         @for (terrain of terrains; track terrain.idTerrain) {
           <mat-card>
             <mat-card-content>
-              <h3 style="margin-top: 0;">{{ terrain.numero }}</h3>
-              <p style="color: #999; margin: 0.25rem 0;">{{ terrain.site.nom }}</p>
+              <h3 style="margin-top: 0;">🎾 {{ terrain.numero }}</h3>
+              <p style="color: #999; margin: 0.25rem 0;">📍 {{ terrain.site.nom }}</p>
             </mat-card-content>
             <mat-card-actions>
               <button mat-button (click)="ouvrirDialogTerrain(terrain)">Modifier</button>
@@ -67,14 +95,17 @@
               <p style="margin: 0.15rem 0;">📅 {{ p.dateMatch | date:'dd/MM/yyyy HH:mm' }}</p>
               <p style="margin: 0.15rem 0;">🎾 {{ p.terrainNumero }}</p>
               <p style="margin: 0.15rem 0;">📍 {{ p.siteNom }}</p>
-              <p style="margin: 0.15rem 0;">{{ p.statutMatch === 'PRIVE' ? 'Match privé' : 'Match public' }}</p>
               <p style="margin: 0.15rem 0;">👤 {{ p.matriculeMembre }} — {{ p.nomMembre }}</p>
-              @if (p.estOrganisateur) {
-                <p style="margin: 0.15rem 0; color: #7c4dff;">Organisateur</p>
-              }
-              <p style="margin: 0.15rem 0;" [style.color]="p.aPaye ? '#66bb6a' : '#ef5350'">
-                {{ p.aPaye ? 'Payé (' + p.montantPaye + ')' : 'Paiement non effectué' }}
-              </p>
+              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                <app-badge [texte]="p.statutMatch" [type]="p.statutMatch"></app-badge>
+                @if (p.estOrganisateur) {
+                  <app-badge texte="ORGANISATEUR" type="ORGANISATEUR"></app-badge>
+                }
+                <app-badge
+                  [texte]="p.aPaye ? 'PAYÉ' : 'NON PAYÉ'"
+                  [type]="p.aPaye ? 'PAYE' : 'NON_PAYE'">
+                </app-badge>
+              </div>
             </mat-card-content>
           </mat-card>
         } @empty {

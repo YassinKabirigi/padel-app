@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Site, SiteModel } from '../../core/services/site';
 import { Terrain, TerrainModel } from '../../core/services/terrain';
 import { Participation, ParticipationDetailModel } from '../../core/services/participation';
+import { Membre } from '../../core/services/membre';
+import { Administrateur } from '../../core/services/administrateur';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { Badge } from '../../shared/badge/badge';
 import { SiteDialog } from './site-dialog/site-dialog';
 import { TerrainDialog } from './terrain-dialog/terrain-dialog';
 
@@ -25,7 +28,8 @@ import { TerrainDialog } from './terrain-dialog/terrain-dialog';
     MatSelectModule,
     MatButtonModule,
     MatDialogModule,
-    MatIconModule
+    MatIconModule,
+    Badge
   ],
   templateUrl: './admin.html',
   styleUrl: './admin.scss'
@@ -34,6 +38,8 @@ export class Admin implements OnInit {
   sites: SiteModel[] = [];
   terrains: TerrainModel[] = [];
   participations: ParticipationDetailModel[] = [];
+  nbMembres = 0;
+  nbAdministrateurs = 0;
 
   erreur = '';
   succes = '';
@@ -42,6 +48,8 @@ export class Admin implements OnInit {
     private siteService: Site,
     private terrainService: Terrain,
     private participationService: Participation,
+    private membreService: Membre,
+    private administrateurService: Administrateur,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {}
@@ -80,9 +88,13 @@ export class Admin implements OnInit {
     this.participationService.getAllParticipations().subscribe({
       next: (data) => { this.participations = data; this.cdr.detectChanges(); }
     });
+    this.membreService.getAllMembres().subscribe({
+      next: (data) => { this.nbMembres = data.length; this.cdr.detectChanges(); }
+    });
+    this.administrateurService.getAllAdministrateurs().subscribe({
+      next: (data) => { this.nbAdministrateurs = data.length; this.cdr.detectChanges(); }
+    });
   }
-
-  // ----- Sites -----
 
   ouvrirDialogSite(site: SiteModel | null): void {
     const dialogRef = this.dialog.open(SiteDialog, {
@@ -134,8 +146,6 @@ export class Admin implements OnInit {
       }
     });
   }
-
-  // ----- Terrains -----
 
   ouvrirDialogTerrain(terrain: TerrainModel | null): void {
     const dialogRef = this.dialog.open(TerrainDialog, {

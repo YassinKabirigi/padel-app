@@ -8,12 +8,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { Badge } from '../../shared/badge/badge';
 import { MembreDialog } from './membre-dialog/membre-dialog';
 import { AdministrateurDialog } from './administrateur-dialog/administrateur-dialog';
 
 @Component({
   selector: 'app-membres',
-  imports: [CommonModule, FormsModule, MatCardModule, MatButtonModule, MatDialogModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatCardModule, MatButtonModule, MatDialogModule, MatIconModule, Badge],
   templateUrl: './membres.html',
   styleUrl: './membres.scss'
 })
@@ -61,15 +62,6 @@ export class Membres implements OnInit {
     this.administrateurService.getAllAdministrateurs().subscribe({
       next: (data) => { this.administrateurs = data; this.cdr.detectChanges(); }
     });
-  }
-
-  couleurBadge(type: string): string {
-    switch (type) {
-      case 'GLOBAL': return '#7c4dff';
-      case 'SITE': return '#00bcd4';
-      case 'LIBRE': return '#66bb6a';
-      default: return '#888';
-    }
   }
 
   // ----- Membres -----

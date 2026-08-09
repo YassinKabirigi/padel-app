@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
+import { Badge } from '../../shared/badge/badge';
 import {
   Dashboard as DashboardService,
   MonProfilModel,
@@ -14,7 +15,7 @@ import {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, MatCardModule, MatIconModule, MatChipsModule, MatButtonModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatChipsModule, MatButtonModule, Badge],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -47,15 +48,6 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.getHistoriquePaiements().subscribe({
       next: (data) => { this.historiquePaiements = data; this.cdr.detectChanges(); }
     });
-  }
-
-  couleurBadge(type: string): string {
-    switch (type) {
-      case 'GLOBAL': return '#7c4dff';
-      case 'SITE': return '#00bcd4';
-      case 'LIBRE': return '#66bb6a';
-      default: return '#888';
-    }
   }
 
   payer(idParticipation: number): void {

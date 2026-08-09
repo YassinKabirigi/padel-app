@@ -11,9 +11,7 @@
           <div>
             <h2 style="margin: 0;">👤 {{ profil.prenom }} {{ profil.nom }}</h2>
             <p style="margin: 0.25rem 0; color: #999;">{{ profil.matricule }}</p>
-            <span [style.background]="couleurBadge(profil.typeMembre)" class="badge">
-              {{ profil.typeMembre }}
-            </span>
+            <app-badge [texte]="profil.typeMembre" [type]="profil.typeMembre"></app-badge>
             @if (profil.siteNom) {
               <span style="margin-left: 0.5rem; color: #999; font-size: 0.85rem;">📍 {{ profil.siteNom }}</span>
             }
@@ -57,9 +55,10 @@
             <p style="margin: 0.15rem 0; font-size: 1.2rem; font-weight: 600;">{{ h.montant }} €</p>
             <p style="margin: 0.15rem 0; color: #999; font-size: 0.85rem;">{{ h.dateMatch | date:'dd/MM/yyyy' }}</p>
             <p style="margin: 0.15rem 0; font-size: 0.85rem;">{{ h.statutMatch === 'PRIVE' ? 'Match privé' : 'Match public' }}</p>
-            <span class="badge" [style.background]="h.datePaiement ? '#66bb6a' : '#ef5350'">
-              {{ h.datePaiement ? 'PAYÉ' : 'NON PAYÉ' }}
-            </span>
+            <app-badge
+              [texte]="h.datePaiement ? 'PAYÉ' : 'NON PAYÉ'"
+              [type]="h.datePaiement ? 'PAYE' : 'NON_PAYE'">
+            </app-badge>
             @if (!h.datePaiement) {
               <button mat-button color="primary" (click)="payer(h.idParticipation)" style="display: block; margin-top: 0.5rem; padding: 0;">
                 💳 Payer
@@ -119,15 +118,14 @@
             <p style="margin: 0.15rem 0;">🎾 {{ r.terrainNumero }}</p>
             <p style="margin: 0.15rem 0;">📍 {{ r.siteNom }}</p>
             <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem;">
-              <span class="badge" [style.background]="r.statutMatch === 'PRIVE' ? '#7c4dff' : '#00bcd4'">
-                {{ r.statutMatch }}
-              </span>
+              <app-badge [texte]="r.statutMatch" [type]="r.statutMatch"></app-badge>
               @if (r.estOrganisateur) {
-                <span class="badge" style="background: #5e35b1;">ORGANISATEUR</span>
+                <app-badge texte="ORGANISATEUR" type="ORGANISATEUR"></app-badge>
               }
-              <span class="badge" [style.background]="r.aPaye ? '#66bb6a' : '#ef5350'">
-                {{ r.aPaye ? 'PAYÉ' : 'NON PAYÉ' }}
-              </span>
+              <app-badge
+                [texte]="r.aPaye ? 'PAYÉ' : 'NON PAYÉ'"
+                [type]="r.aPaye ? 'PAYE' : 'NON_PAYE'">
+              </app-badge>
             </div>
           </div>
         } @empty {
