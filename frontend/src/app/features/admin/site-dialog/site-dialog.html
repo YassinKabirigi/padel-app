@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>{{ data.site ? 'Modifier le site' : 'Nouveau site' }}</h2>
+
+<mat-dialog-content>
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Nom</mat-label>
+    <input matInput [(ngModel)]="nom" name="nom" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Adresse</mat-label>
+    <input matInput [(ngModel)]="adresse" name="adresse" />
+  </mat-form-field>
+
+  <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+    <div style="flex: 1;">
+      <label style="display: block; margin-bottom: 0.25rem;">Ouverture</label>
+      <input type="time" [(ngModel)]="heureOuverture" name="ouverture" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
+    </div>
+    <div style="flex: 1;">
+      <label style="display: block; margin-bottom: 0.25rem;">Fermeture</label>
+      <input type="time" [(ngModel)]="heureFermeture" name="fermeture" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onAnnuler()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="onValider()">Valider</button>
+</mat-dialog-actions>

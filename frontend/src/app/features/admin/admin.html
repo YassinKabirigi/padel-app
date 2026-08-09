@@ -1,47 +1,33 @@
 <div class="page-container">
   @if (erreur) {
-    <p style="color: #c62828;">{{ erreur }}</p>
+    <p style="color: #ef5350;">{{ erreur }}</p>
   }
   @if (succes) {
-    <p style="color: #2e7d32;">{{ succes }}</p>
+    <p style="color: #66bb6a;">{{ succes }}</p>
   }
 
-  <mat-card style="margin-bottom: 2rem;">
-    <mat-card-header>
-      <mat-card-title>Sites</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      @for (site of sites; track site.idSite) {
-        <p>{{ site.nom }} — {{ site.adresse }} ({{ site.heureOuverture }} - {{ site.heureFermeture }})</p>
-      }
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h2>Sites</h2>
+    <button mat-raised-button color="primary" (click)="ouvrirDialogSite(null)">
+      <mat-icon>add</mat-icon> Nouveau site
+    </button>
+  </div>
 
-      <h4>Créer un site</h4>
-      <form (ngSubmit)="creerSite()">
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Nom</mat-label>
-          <input matInput [(ngModel)]="nouveauSiteNom" name="nom" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Adresse</mat-label>
-          <input matInput [(ngModel)]="nouveauSiteAdresse" name="adresse" />
-        </mat-form-field>
-
-        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-          <div style="flex: 1;">
-            <label style="display: block; margin-bottom: 0.25rem;">Ouverture</label>
-            <input type="time" [(ngModel)]="nouveauSiteOuverture" name="ouverture" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;" />
-          </div>
-          <div style="flex: 1;">
-            <label style="display: block; margin-bottom: 0.25rem;">Fermeture</label>
-            <input type="time" [(ngModel)]="nouveauSiteFermeture" name="fermeture" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;" />
-          </div>
-        </div>
-
-        <button mat-raised-button color="primary" type="submit">Créer le site</button>
-      </form>
-    </mat-card-content>
-  </mat-card>
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    @for (site of sites; track site.idSite) {
+      <mat-card>
+        <mat-card-content>
+          <h3 style="margin-top: 0;">{{ site.nom }}</h3>
+          <p style="color: #999; margin: 0.25rem 0;">{{ site.adresse }}</p>
+          <p style="color: #999; margin: 0.25rem 0;">{{ site.heureOuverture }} - {{ site.heureFermeture }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button (click)="ouvrirDialogSite(site)">Modifier</button>
+          <button mat-button color="warn" (click)="supprimerSite(site.idSite)">Supprimer</button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
 
   <mat-card>
     <mat-card-header>
@@ -59,7 +45,6 @@
           <input matInput [(ngModel)]="nouveauTerrainNumero" name="numero" placeholder="Ex: Terrain 3" />
         </mat-form-field>
 
-
         <mat-form-field appearance="outline" style="width: 100%;">
           <mat-label>Site</mat-label>
           <mat-select [(ngModel)]="nouveauTerrainSiteId" name="siteId">
@@ -71,9 +56,9 @@
 
         <button mat-raised-button color="primary" type="submit">Créer le terrain</button>
       </form>
-
     </mat-card-content>
   </mat-card>
+
   <mat-card style="margin-top: 2rem;">
     <mat-card-header>
       <mat-card-title>Membres</mat-card-title>
@@ -132,12 +117,62 @@
 
   <mat-card style="margin-top: 2rem;">
     <mat-card-header>
+      <mat-card-title>Administrateurs</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @for (admin of administrateurs; track admin.idAdmin) {
+        <p>ADMIN-{{ admin.idAdmin }} — {{ admin.prenom }} {{ admin.nom }} ({{ admin.typeAdmin }})</p>
+      }
+
+      <h4>Créer un administrateur</h4>
+      <form (ngSubmit)="creerAdministrateur()">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Nom</mat-label>
+          <input matInput [(ngModel)]="nouveauAdminNom" name="adminNom" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Prénom</mat-label>
+          <input matInput [(ngModel)]="nouveauAdminPrenom" name="adminPrenom" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Email</mat-label>
+          <input matInput [(ngModel)]="nouveauAdminEmail" name="adminEmail" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Type d'administrateur</mat-label>
+          <mat-select [(ngModel)]="nouveauAdminType" name="adminType">
+            <mat-option value="GLOBAL">Global</mat-option>
+            <mat-option value="SITE">Site</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        @if (nouveauAdminType === 'SITE') {
+          <mat-form-field appearance="outline" style="width: 100%;">
+            <mat-label>Site géré</mat-label>
+            <mat-select [(ngModel)]="nouveauAdminSiteId" name="adminSiteId">
+              @for (site of sites; track site.idSite) {
+                <mat-option [value]="site.idSite">{{ site.nom }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+
+        <button mat-raised-button color="primary" type="submit">Créer l'administrateur</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card style="margin-top: 2rem;">
+    <mat-card-header>
       <mat-card-title>Réservations</mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <table style="width: 100%; border-collapse: collapse;">
         <thead>
-        <tr style="text-align: left; border-bottom: 2px solid #ddd;">
+        <tr style="text-align: left; border-bottom: 2px solid #444;">
           <th style="padding: 0.5rem;">Membre</th>
           <th style="padding: 0.5rem;">Match</th>
           <th style="padding: 0.5rem;">Terrain</th>
@@ -148,13 +183,13 @@
         </thead>
         <tbody>
           @for (p of participations; track p.idParticipation) {
-            <tr style="border-bottom: 1px solid #eee;">
+            <tr style="border-bottom: 1px solid #333;">
               <td style="padding: 0.5rem;">{{ p.matriculeMembre }} — {{ p.nomMembre }}</td>
               <td style="padding: 0.5rem;">{{ p.dateMatch | date:'dd/MM/yyyy HH:mm' }}</td>
               <td style="padding: 0.5rem;">{{ p.siteNom }} — {{ p.terrainNumero }}</td>
               <td style="padding: 0.5rem;">{{ p.statutMatch }}</td>
               <td style="padding: 0.5rem;">{{ p.estOrganisateur ? 'Oui' : 'Non' }}</td>
-              <td style="padding: 0.5rem;" [style.color]="p.aPaye ? '#2e7d32' : '#c62828'">
+              <td style="padding: 0.5rem;" [style.color]="p.aPaye ? '#66bb6a' : '#ef5350'">
                 {{ p.aPaye ? p.montantPaye : 'Non payé' }}
               </td>
             </tr>

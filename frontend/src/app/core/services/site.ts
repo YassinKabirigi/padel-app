@@ -24,4 +24,11 @@ export class Site {
   createSite(site: Omit<SiteModel, 'idSite'>): Observable<SiteModel> {
     return this.http.post<SiteModel>(this.apiUrl, site);
   }
+  updateSite(id: number, site: Omit<SiteModel, 'idSite'>): Observable<SiteModel> {
+    return this.http.put<SiteModel>(`${this.apiUrl}/${id}`, site);
+  }
+
+  deleteSite(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }
