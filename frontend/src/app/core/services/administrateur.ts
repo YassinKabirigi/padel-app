@@ -26,4 +26,12 @@ export class Administrateur {
   createAdministrateur(admin: Omit<AdministrateurModel, 'idAdmin'>): Observable<AdministrateurModel> {
     return this.http.post<AdministrateurModel>(this.apiUrl, admin);
   }
+
+  updateAdministrateur(id: number, admin: Omit<AdministrateurModel, 'idAdmin'>): Observable<AdministrateurModel> {
+    return this.http.put<AdministrateurModel>(`${this.apiUrl}/${id}`, admin);
+  }
+
+  deleteAdministrateur(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

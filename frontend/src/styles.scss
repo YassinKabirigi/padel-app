@@ -36,6 +36,11 @@ body {
     padding: 0.5rem;
   }
 
+  @media (max-width: 700px) {
+    .page-container > div[style*="grid-template-columns"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
   mat-toolbar {
     flex-wrap: wrap;
     height: auto;

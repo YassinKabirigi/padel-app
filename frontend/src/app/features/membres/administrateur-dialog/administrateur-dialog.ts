@@ -7,32 +7,30 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { SiteModel } from '../../../core/services/site';
-import { MembreModel } from '../../../core/services/membre';
+import { AdministrateurModel } from '../../../core/services/administrateur';
 
 @Component({
-  selector: 'app-membre-dialog',
+  selector: 'app-administrateur-dialog',
   imports: [CommonModule, FormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule],
-  templateUrl: './membre-dialog.html',
-  styleUrl: './membre-dialog.scss'
+  templateUrl: './administrateur-dialog.html',
+  styleUrl: './administrateur-dialog.scss'
 })
-export class MembreDialog {
+export class AdministrateurDialog {
   nom: string;
   prenom: string;
   email: string;
-  telephone: string;
-  typeMembre: string;
+  typeAdmin: string;
   siteId: number | null;
 
   constructor(
-    public dialogRef: MatDialogRef<MembreDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: { membre: MembreModel | null; sites: SiteModel[] }
+    public dialogRef: MatDialogRef<AdministrateurDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: { admin: AdministrateurModel | null; sites: SiteModel[] }
   ) {
-    this.nom = data.membre?.nom ?? '';
-    this.prenom = data.membre?.prenom ?? '';
-    this.email = data.membre?.email ?? '';
-    this.telephone = data.membre?.telephone ?? '';
-    this.typeMembre = data.membre?.typeMembre ?? 'GLOBAL';
-    this.siteId = data.membre?.site?.idSite ?? null;
+    this.nom = data.admin?.nom ?? '';
+    this.prenom = data.admin?.prenom ?? '';
+    this.email = data.admin?.email ?? '';
+    this.typeAdmin = data.admin?.typeAdmin ?? 'GLOBAL';
+    this.siteId = data.admin?.site?.idSite ?? null;
   }
 
   onAnnuler(): void {
@@ -43,16 +41,15 @@ export class MembreDialog {
     if (!this.nom || !this.prenom || !this.email) {
       return;
     }
-    if (this.typeMembre === 'SITE' && !this.siteId) {
+    if (this.typeAdmin === 'SITE' && !this.siteId) {
       return;
     }
     this.dialogRef.close({
       nom: this.nom,
       prenom: this.prenom,
       email: this.email,
-      telephone: this.telephone,
-      typeMembre: this.typeMembre,
-      site: this.typeMembre === 'SITE' ? { idSite: this.siteId } : null
+      typeAdmin: this.typeAdmin,
+      site: this.typeAdmin === 'SITE' ? { idSite: this.siteId } : null
     });
   }
 }

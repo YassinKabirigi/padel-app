@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Modifier le membre</h2>
+<h2 mat-dialog-title>{{ data.membre ? 'Modifier le membre' : 'Nouveau membre' }}</h2>
 
 <mat-dialog-content>
   <mat-form-field appearance="outline" style="width: 100%;">
@@ -21,7 +21,29 @@
     <input matInput [(ngModel)]="telephone" name="telephone" />
   </mat-form-field>
 
-  <p style="color: #999; font-size: 0.85rem;">Le type de membre ({{ typeMembre }}) ne peut pas être modifié (lié au préfixe du matricule).</p>
+  @if (data.membre) {
+    <p style="color: #999; font-size: 0.85rem;">Type : {{ typeMembre }} (non modifiable, lié au matricule)</p>
+  } @else {
+    <mat-form-field appearance="outline" style="width: 100%;">
+      <mat-label>Type de membre</mat-label>
+      <mat-select [(ngModel)]="typeMembre" name="typeMembre">
+        <mat-option value="GLOBAL">Global</mat-option>
+        <mat-option value="SITE">Site</mat-option>
+        <mat-option value="LIBRE">Libre</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    @if (typeMembre === 'SITE') {
+      <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>Site de rattachement</mat-label>
+        <mat-select [(ngModel)]="siteId" name="siteId">
+          @for (site of data.sites; track site.idSite) {
+            <mat-option [value]="site.idSite">{{ site.nom }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

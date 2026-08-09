@@ -5,29 +5,15 @@ import { Site, SiteModel } from '../../core/services/site';
 import { Membre, MembreModel } from '../../core/services/membre';
 import { Administrateur, AdministrateurModel } from '../../core/services/administrateur';
 import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MembreDialog } from './membre-dialog/membre-dialog';
+import { AdministrateurDialog } from './administrateur-dialog/administrateur-dialog';
 
 @Component({
   selector: 'app-membres',
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatChipsModule,
-    MatDialogModule,
-    MatIconModule
-  ],
+  imports: [CommonModule, FormsModule, MatCardModule, MatButtonModule, MatDialogModule, MatIconModule],
   templateUrl: './membres.html',
   styleUrl: './membres.scss'
 })
@@ -35,19 +21,6 @@ export class Membres implements OnInit {
   sites: SiteModel[] = [];
   membres: MembreModel[] = [];
   administrateurs: AdministrateurModel[] = [];
-
-  nouveauMembreNom = '';
-  nouveauMembrePrenom = '';
-  nouveauMembreEmail = '';
-  nouveauMembreTelephone = '';
-  nouveauMembreType = 'GLOBAL';
-  nouveauMembreSiteId: number | null = null;
-
-  nouveauAdminNom = '';
-  nouveauAdminPrenom = '';
-  nouveauAdminEmail = '';
-  nouveauAdminType = 'GLOBAL';
-  nouveauAdminSiteId: number | null = null;
 
   erreur = '';
   succes = '';
@@ -101,47 +74,7 @@ export class Membres implements OnInit {
 
   // ----- Membres -----
 
-  creerMembre(): void {
-    if (!this.nouveauMembreNom || !this.nouveauMembrePrenom || !this.nouveauMembreEmail) {
-      this.afficherErreur('Veuillez remplir tous les champs obligatoires');
-      return;
-    }
-    if (this.nouveauMembreType === 'SITE' && !this.nouveauMembreSiteId) {
-      this.afficherErreur('Veuillez sélectionner un site pour un membre de type Site');
-      return;
-    }
-
-    const prefixe = this.nouveauMembreType === 'GLOBAL' ? 'G'
-      : this.nouveauMembreType === 'SITE' ? 'S' : 'L';
-    const matricule = prefixe + Math.floor(1000 + Math.random() * 9000);
-
-    const nouveauMembre: MembreModel = {
-      matricule,
-      nom: this.nouveauMembreNom,
-      prenom: this.nouveauMembrePrenom,
-      email: this.nouveauMembreEmail,
-      telephone: this.nouveauMembreTelephone,
-      dateInscription: new Date().toISOString().split('T')[0],
-      typeMembre: this.nouveauMembreType,
-      site: this.nouveauMembreType === 'SITE' ? { idSite: this.nouveauMembreSiteId! } : null
-    };
-
-    this.membreService.createMembre(nouveauMembre).subscribe({
-      next: () => {
-        this.afficherSucces(`Membre créé avec succès (matricule : ${matricule})`);
-        this.nouveauMembreNom = '';
-        this.nouveauMembrePrenom = '';
-        this.nouveauMembreEmail = '';
-        this.nouveauMembreTelephone = '';
-        this.chargerDonnees();
-      },
-      error: () => {
-        this.afficherErreur('Erreur lors de la création du membre');
-      }
-    });
-  }
-
-  ouvrirDialogModifierMembre(membre: MembreModel): void {
+  ouvrirDialogMembre(membre: MembreModel | null): void {
     const dialogRef = this.dialog.open(MembreDialog, {
       width: '450px',
       data: { membre, sites: this.sites }
@@ -152,15 +85,42 @@ export class Membres implements OnInit {
         return;
       }
 
-      this.membreService.updateMembre(membre.matricule, resultat).subscribe({
-        next: () => {
-          this.afficherSucces('Membre modifié avec succès');
-          this.chargerDonnees();
-        },
-        error: (err) => {
-          this.afficherErreur(err.error?.erreur || 'Erreur lors de la modification');
-        }
-      });
+      if (membre) {
+        this.membreService.updateMembre(membre.matricule, resultat).subscribe({
+          next: () => {
+            this.afficherSucces('Membre modifié avec succès');
+            this.chargerDonnees();
+          },
+          error: (err) => {
+            this.afficherErreur(err.error?.erreur || 'Erreur lors de la modification');
+          }
+        });
+      } else {
+        const prefixe = resultat.typeMembre === 'GLOBAL' ? 'G'
+          : resultat.typeMembre === 'SITE' ? 'S' : 'L';
+        const matricule = prefixe + Math.floor(1000 + Math.random() * 9000);
+
+        const nouveauMembre: MembreModel = {
+          matricule,
+          nom: resultat.nom,
+          prenom: resultat.prenom,
+          email: resultat.email,
+          telephone: resultat.telephone,
+          dateInscription: new Date().toISOString().split('T')[0],
+          typeMembre: resultat.typeMembre,
+          site: resultat.site
+        };
+
+        this.membreService.createMembre(nouveauMembre).subscribe({
+          next: () => {
+            this.afficherSucces(`Membre créé avec succès (matricule : ${matricule})`);
+            this.chargerDonnees();
+          },
+          error: () => {
+            this.afficherErreur('Erreur lors de la création du membre');
+          }
+        });
+      }
     });
   }
 
@@ -186,34 +146,53 @@ export class Membres implements OnInit {
 
   // ----- Administrateurs -----
 
-  creerAdministrateur(): void {
-    if (!this.nouveauAdminNom || !this.nouveauAdminPrenom || !this.nouveauAdminEmail) {
-      this.afficherErreur('Veuillez remplir tous les champs obligatoires');
+  ouvrirDialogAdministrateur(admin: AdministrateurModel | null): void {
+    const dialogRef = this.dialog.open(AdministrateurDialog, {
+      width: '450px',
+      data: { admin, sites: this.sites }
+    });
+
+    dialogRef.afterClosed().subscribe((resultat) => {
+      if (!resultat) {
+        return;
+      }
+
+      const operation = admin
+        ? this.administrateurService.updateAdministrateur(admin.idAdmin, resultat)
+        : this.administrateurService.createAdministrateur(resultat);
+
+      operation.subscribe({
+        next: (result) => {
+          this.afficherSucces(
+            admin
+              ? 'Administrateur modifié avec succès'
+              : `Administrateur créé — identifiant de connexion : ADMIN-${result.idAdmin}`
+          );
+          this.chargerDonnees();
+        },
+        error: () => {
+          this.afficherErreur('Erreur lors de l\'opération (réservé aux administrateurs globaux)');
+        }
+      });
+    });
+  }
+
+  supprimerAdministrateur(id: number): void {
+    if (!confirm('Confirmer la suppression de cet administrateur ?')) {
       return;
     }
-    if (this.nouveauAdminType === 'SITE' && !this.nouveauAdminSiteId) {
-      this.afficherErreur('Veuillez sélectionner un site pour un administrateur de type Site');
-      return;
-    }
-
-    const nouvelAdmin: Omit<AdministrateurModel, 'idAdmin'> = {
-      nom: this.nouveauAdminNom,
-      prenom: this.nouveauAdminPrenom,
-      email: this.nouveauAdminEmail,
-      typeAdmin: this.nouveauAdminType,
-      site: this.nouveauAdminType === 'SITE' ? { idSite: this.nouveauAdminSiteId! } : null
-    };
-
-    this.administrateurService.createAdministrateur(nouvelAdmin).subscribe({
-      next: (admin) => {
-        this.afficherSucces(`Administrateur créé — identifiant de connexion : ADMIN-${admin.idAdmin}`);
-        this.nouveauAdminNom = '';
-        this.nouveauAdminPrenom = '';
-        this.nouveauAdminEmail = '';
+    this.administrateurService.deleteAdministrateur(id).subscribe({
+      next: () => {
+        this.afficherSucces('Administrateur supprimé');
         this.chargerDonnees();
       },
-      error: () => {
-        this.afficherErreur('Erreur lors de la création (réservé aux administrateurs globaux)');
+      error: (err) => {
+        if (err.status === 409) {
+          this.afficherErreur(err.error?.erreur || 'Impossible de supprimer : élément encore référencé');
+        } else {
+          this.afficherErreur('Erreur lors de la suppression (réservé aux administrateurs globaux)');
+        }
+        this.chargerDonnees();
       }
     });
   }

@@ -6,121 +6,63 @@
     <p style="color: #66bb6a;">{{ succes }}</p>
   }
 
-  <mat-card style="margin-bottom: 2rem;">
-    <mat-card-header>
-      <mat-card-title>Membres</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      @for (membre of membres; track membre.matricule) {
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #333;">
-          <span>
-            {{ membre.matricule }} — {{ membre.prenom }} {{ membre.nom }}
-            <span [style.background]="couleurBadge(membre.typeMembre)"
-                  style="padding: 0.15rem 0.5rem; border-radius: 10px; color: white; font-size: 0.75rem; margin-left: 0.5rem;">
-              {{ membre.typeMembre }}
-            </span>
-          </span>
-          <span>
-            <button mat-icon-button (click)="ouvrirDialogModifierMembre(membre)"><mat-icon>edit</mat-icon></button>
-            <button mat-icon-button color="warn" (click)="supprimerMembre(membre.matricule)"><mat-icon>delete</mat-icon></button>
-          </span>
-        </div>
-      }
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
 
-      <h4 style="margin-top: 1.5rem;">Créer un membre</h4>
-      <form (ngSubmit)="creerMembre()">
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Nom</mat-label>
-          <input matInput [(ngModel)]="nouveauMembreNom" name="membreNom" />
-        </mat-form-field>
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Membres</h2>
+        <button mat-raised-button color="primary" (click)="ouvrirDialogMembre(null)">
+          <mat-icon>add</mat-icon> Nouveau
+        </button>
+      </div>
 
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Prénom</mat-label>
-          <input matInput [(ngModel)]="nouveauMembrePrenom" name="membrePrenom" />
-        </mat-form-field>
+      <mat-card>
+        <mat-card-content>
+          @for (membre of membres; track membre.matricule) {
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #333;">
+              <span>
+                {{ membre.matricule }} — {{ membre.prenom }} {{ membre.nom }}
+                <span [style.background]="couleurBadge(membre.typeMembre)"
+                      style="padding: 0.15rem 0.5rem; border-radius: 10px; color: white; font-size: 0.75rem; margin-left: 0.5rem;">
+                  {{ membre.typeMembre }}
+                </span>
+              </span>
+              <span>
+                <button mat-icon-button (click)="ouvrirDialogMembre(membre)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="supprimerMembre(membre.matricule)"><mat-icon>delete</mat-icon></button>
+              </span>
+            </div>
+          } @empty {
+            <p style="color: #999;">Aucun membre pour l'instant.</p>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
 
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Email</mat-label>
-          <input matInput [(ngModel)]="nouveauMembreEmail" name="membreEmail" />
-        </mat-form-field>
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Administrateurs</h2>
+        <button mat-raised-button color="primary" (click)="ouvrirDialogAdministrateur(null)">
+          <mat-icon>add</mat-icon> Nouveau
+        </button>
+      </div>
 
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Téléphone</mat-label>
-          <input matInput [(ngModel)]="nouveauMembreTelephone" name="membreTelephone" />
-        </mat-form-field>
+      <mat-card>
+        <mat-card-content>
+          @for (admin of administrateurs; track admin.idAdmin) {
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #333;">
+              <span>ADMIN-{{ admin.idAdmin }} — {{ admin.prenom }} {{ admin.nom }} ({{ admin.typeAdmin }})</span>
+              <span>
+                <button mat-icon-button (click)="ouvrirDialogAdministrateur(admin)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="supprimerAdministrateur(admin.idAdmin)"><mat-icon>delete</mat-icon></button>
+              </span>
+            </div>
+          } @empty {
+            <p style="color: #999;">Aucun administrateur pour l'instant.</p>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
 
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Type de membre</mat-label>
-          <mat-select [(ngModel)]="nouveauMembreType" name="membreType">
-            <mat-option value="GLOBAL">Global</mat-option>
-            <mat-option value="SITE">Site</mat-option>
-            <mat-option value="LIBRE">Libre</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        @if (nouveauMembreType === 'SITE') {
-          <mat-form-field appearance="outline" style="width: 100%;">
-            <mat-label>Site de rattachement</mat-label>
-            <mat-select [(ngModel)]="nouveauMembreSiteId" name="membreSiteId">
-              @for (site of sites; track site.idSite) {
-                <mat-option [value]="site.idSite">{{ site.nom }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        }
-
-        <button mat-raised-button color="primary" type="submit">Créer le membre</button>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Administrateurs</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      @for (admin of administrateurs; track admin.idAdmin) {
-        <p>ADMIN-{{ admin.idAdmin }} — {{ admin.prenom }} {{ admin.nom }} ({{ admin.typeAdmin }})</p>
-      }
-
-      <h4>Créer un administrateur</h4>
-      <form (ngSubmit)="creerAdministrateur()">
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Nom</mat-label>
-          <input matInput [(ngModel)]="nouveauAdminNom" name="adminNom" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Prénom</mat-label>
-          <input matInput [(ngModel)]="nouveauAdminPrenom" name="adminPrenom" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Email</mat-label>
-          <input matInput [(ngModel)]="nouveauAdminEmail" name="adminEmail" />
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Type d'administrateur</mat-label>
-          <mat-select [(ngModel)]="nouveauAdminType" name="adminType">
-            <mat-option value="GLOBAL">Global</mat-option>
-            <mat-option value="SITE">Site</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        @if (nouveauAdminType === 'SITE') {
-          <mat-form-field appearance="outline" style="width: 100%;">
-            <mat-label>Site géré</mat-label>
-            <mat-select [(ngModel)]="nouveauAdminSiteId" name="adminSiteId">
-              @for (site of sites; track site.idSite) {
-                <mat-option [value]="site.idSite">{{ site.nom }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        }
-
-        <button mat-raised-button color="primary" type="submit">Créer l'administrateur</button>
-      </form>
-    </mat-card-content>
-  </mat-card>
+  </div>
 </div>

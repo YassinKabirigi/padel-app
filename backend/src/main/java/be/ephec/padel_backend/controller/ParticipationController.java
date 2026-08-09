@@ -41,9 +41,14 @@ public class ParticipationController {
 
     @GetMapping("/me")
     public List<ParticipationDetailDto> getMesParticipations(org.springframework.security.core.Authentication authentication) {
-        String matricule = authentication.getName();
+        String identifiant = authentication.getName();
+
+        if (identifiant.startsWith("ADMIN-")) {
+            return List.of();
+        }
+
         List<Participation> participations = participationRepository.findAll().stream()
-                .filter(p -> p.getMembre().getMatricule().equals(matricule))
+                .filter(p -> p.getMembre().getMatricule().equals(identifiant))
                 .toList();
 
         return participations.stream().map(p -> new ParticipationDetailDto(
