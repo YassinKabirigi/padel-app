@@ -1,5 +1,5 @@
 <div class="page-container">
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+  <div class="layout-reservation">
 
     <mat-card>
       <mat-card-header>
@@ -28,13 +28,23 @@
             <input type="time" [(ngModel)]="heure" name="heure" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
           </div>
 
-          <mat-form-field appearance="outline" style="width: 100%;">
-            <mat-label>Type de match</mat-label>
-            <mat-select [(ngModel)]="statut" name="statut">
-              <mat-option value="PRIVE">Privé</mat-option>
-              <mat-option value="PUBLIC">Public</mat-option>
-            </mat-select>
-          </mat-form-field>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: #999; font-size: 0.85rem;">Type de match</label>
+            <div style="display: flex; gap: 0.75rem;">
+              <div
+                class="tuile-type"
+                [class.tuile-selectionnee]="statut === 'PRIVE'"
+                (click)="statut = 'PRIVE'">
+                🎾 Privé
+              </div>
+              <div
+                class="tuile-type"
+                [class.tuile-selectionnee]="statut === 'PUBLIC'"
+                (click)="statut = 'PUBLIC'">
+                🌍 Public
+              </div>
+            </div>
+          </div>
 
           @if (erreur) {
             <p style="color: #ef5350;">{{ erreur }}</p>
@@ -43,8 +53,13 @@
             <p style="color: #66bb6a;">{{ succes }}</p>
           }
 
-          <button mat-raised-button color="primary" type="submit" [disabled]="chargement" style="width: 100%;">
-            {{ chargement ? 'Envoi...' : 'Réserver' }}
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="chargement"
+            style="width: 100%; padding: 0.9rem; font-size: 1.05rem; border-radius: 10px; margin-top: 0.5rem;">
+            {{ chargement ? 'Envoi...' : '🎾 Réserver mon match' }}
           </button>
         </form>
       </mat-card-content>
@@ -55,19 +70,17 @@
         <mat-card-title>Terrains disponibles</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        @for (terrain of terrains; track terrain.idTerrain) {
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid #333;">
-            <span>
-              <mat-icon style="vertical-align: middle; font-size: 20px;">sports_tennis</mat-icon>
-              {{ terrain.numero }}
-            </span>
-            <span style="background: #00bcd4; color: white; padding: 0.15rem 0.6rem; border-radius: 12px; font-size: 0.8rem;">
-              {{ terrain.site.nom }}
-            </span>
-          </div>
-        } @empty {
-          <p style="color: #999;">Aucun terrain disponible.</p>
-        }
+        <div class="grille-terrains">
+          @for (terrain of terrains; track terrain.idTerrain) {
+            <div class="carte-terrain">
+              <p style="margin: 0.2rem 0; font-weight: 500;">🎾 {{ terrain.numero }}</p>
+              <p style="margin: 0.2rem 0; color: #999; font-size: 0.85rem;">📍 {{ terrain.site.nom }}</p>
+              <p style="margin: 0.2rem 0; font-size: 0.85rem;">🟢 Disponible</p>
+            </div>
+          } @empty {
+            <p style="color: #999;">Aucun terrain disponible.</p>
+          }
+        </div>
       </mat-card-content>
     </mat-card>
 
