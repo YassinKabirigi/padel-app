@@ -31,23 +31,33 @@ body {
   padding: 1.5rem;
 }
 
-@media (max-width: 600px) {
-  .page-container {
+@media (max-width: 700px) {
+  .page-container,
+  .page-container-large {
     padding: 0.5rem;
   }
 
-  @media (max-width: 700px) {
-    .page-container > div[style*="grid-template-columns"] {
-      grid-template-columns: 1fr !important;
-    }
+  .page-container > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
   }
+
   mat-toolbar {
-    flex-wrap: wrap;
-    height: auto;
-    padding: 0.5rem;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    height: auto !important;
+    padding: 0.75rem !important;
+    gap: 0.3rem;
   }
 
-  mat-toolbar a {
-    font-size: 0.85rem;
+  mat-toolbar span[style*="flex: 1"] {
+    display: none;
+  }
+
+  mat-toolbar a,
+  mat-toolbar button {
+    width: 100%;
+    justify-content: flex-start !important;
+    font-size: 0.9rem;
   }
 }
