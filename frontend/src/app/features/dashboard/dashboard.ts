@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
 import { Badge } from '../../shared/badge/badge';
 import {
   Dashboard as DashboardService,
@@ -15,7 +16,7 @@ import {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, MatCardModule, MatIconModule, MatChipsModule, MatButtonModule, Badge],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatChipsModule, MatButtonModule, MatTabsModule, Badge],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })

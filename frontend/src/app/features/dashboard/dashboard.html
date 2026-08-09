@@ -1,138 +1,149 @@
 <div class="page-container">
 
-  <!-- Mon profil -->
-  <mat-card style="margin-bottom: 1.5rem;">
-    <mat-card-content>
-      @if (profil) {
-        <div style="display: flex; align-items: center; gap: 1.25rem;">
-          <div class="avatar-profil">
-            {{ profil.prenom.charAt(0) }}{{ profil.nom.charAt(0) }}
-          </div>
-          <div>
-            <h2 style="margin: 0;">👤 {{ profil.prenom }} {{ profil.nom }}</h2>
-            <p style="margin: 0.25rem 0; color: #999;">{{ profil.matricule }}</p>
-            <app-badge [texte]="profil.typeMembre" [type]="profil.typeMembre"></app-badge>
-            @if (profil.siteNom) {
-              <span style="margin-left: 0.5rem; color: #999; font-size: 0.85rem;">📍 {{ profil.siteNom }}</span>
+  <mat-tab-group animationDuration="200ms">
+
+    <!-- Onglet 1 : Profil & Paiements -->
+    <mat-tab label="👤 Profil & Paiements">
+      <div style="padding-top: 1.5rem;">
+
+        <mat-card style="margin-bottom: 1.5rem;">
+          <mat-card-content>
+            @if (profil) {
+              <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <div class="avatar-profil">
+                  {{ profil.prenom.charAt(0) }}{{ profil.nom.charAt(0) }}
+                </div>
+                <div>
+                  <h2 style="margin: 0;">👤 {{ profil.prenom }} {{ profil.nom }}</h2>
+                  <p style="margin: 0.25rem 0; color: #999;">{{ profil.matricule }}</p>
+                  <app-badge [texte]="profil.typeMembre" [type]="profil.typeMembre"></app-badge>
+                  @if (profil.siteNom) {
+                    <span style="margin-left: 0.5rem; color: #999; font-size: 0.85rem;">📍 {{ profil.siteNom }}</span>
+                  }
+                </div>
+              </div>
+            } @else {
+              <p>Chargement...</p>
             }
-          </div>
-        </div>
-      } @else {
-        <p>Chargement...</p>
-      }
-    </mat-card-content>
-  </mat-card>
+          </mat-card-content>
+        </mat-card>
 
-  <!-- Mes paiements -->
-  <mat-card style="margin-bottom: 1.5rem;">
-    <mat-card-header>
-      <mat-card-title><mat-icon style="vertical-align: middle;">payments</mat-icon> Mes paiements</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      @if (paiements) {
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
-          <div style="flex: 1; min-width: 120px;">
-            <p style="color: #888; margin: 0;">Total réservations</p>
-            <p style="font-size: 1.8rem; margin: 0; font-weight: 600;">{{ paiements.montantDu }} €</p>
-          </div>
-          <div style="flex: 1; min-width: 120px;">
-            <p style="color: #888; margin: 0;">Montant payé</p>
-            <p style="font-size: 1.8rem; margin: 0; font-weight: 600; color: #66bb6a;">{{ paiements.montantPaye }} €</p>
-          </div>
-          <div style="flex: 1; min-width: 120px;">
-            <p style="color: #888; margin: 0;">Solde restant</p>
-            <p style="font-size: 1.8rem; margin: 0; font-weight: 600;" [style.color]="paiements.soldeRestant > 0 ? '#ef5350' : '#66bb6a'">
-              {{ paiements.soldeRestant }} €
-            </p>
-          </div>
-        </div>
-      }
-
-      <h4>Historique des paiements</h4>
-      <div class="grille-historique">
-        @for (h of historiquePaiements; track h.idParticipation) {
-          <div class="carte-historique">
-            <p style="margin: 0.15rem 0; font-size: 1.2rem; font-weight: 600;">{{ h.montant }} €</p>
-            <p style="margin: 0.15rem 0; color: #999; font-size: 0.85rem;">{{ h.dateMatch | date:'dd/MM/yyyy' }}</p>
-            <p style="margin: 0.15rem 0; font-size: 0.85rem;">{{ h.statutMatch === 'PRIVE' ? 'Match privé' : 'Match public' }}</p>
-            <app-badge
-              [texte]="h.datePaiement ? 'PAYÉ' : 'NON PAYÉ'"
-              [type]="h.datePaiement ? 'PAYE' : 'NON_PAYE'">
-            </app-badge>
-            @if (!h.datePaiement) {
-              <button mat-button color="primary" (click)="payer(h.idParticipation)" style="display: block; margin-top: 0.5rem; padding: 0;">
-                💳 Payer
-              </button>
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title><mat-icon style="vertical-align: middle;">payments</mat-icon> Mes paiements</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            @if (paiements) {
+              <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                <div style="flex: 1; min-width: 120px;">
+                  <p style="color: #888; margin: 0;">Total réservations</p>
+                  <p style="font-size: 1.8rem; margin: 0; font-weight: 600;">{{ paiements.montantDu }} €</p>
+                </div>
+                <div style="flex: 1; min-width: 120px;">
+                  <p style="color: #888; margin: 0;">Montant payé</p>
+                  <p style="font-size: 1.8rem; margin: 0; font-weight: 600; color: #66bb6a;">{{ paiements.montantPaye }} €</p>
+                </div>
+                <div style="flex: 1; min-width: 120px;">
+                  <p style="color: #888; margin: 0;">Solde restant</p>
+                  <p style="font-size: 1.8rem; margin: 0; font-weight: 600;" [style.color]="paiements.soldeRestant > 0 ? '#ef5350' : '#66bb6a'">
+                    {{ paiements.soldeRestant }} €
+                  </p>
+                </div>
+              </div>
             }
-          </div>
-        } @empty {
-          <p style="color: #999;">Aucun paiement pour l'instant.</p>
-        }
-      </div>
-    </mat-card-content>
-  </mat-card>
 
-  <!-- Mes statistiques -->
-  <mat-card style="margin-bottom: 1.5rem;">
-    <mat-card-header>
-      <mat-card-title><mat-icon style="vertical-align: middle;">bar_chart</mat-icon> Mes statistiques</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      @if (stats) {
-        <div class="grille-kpi">
-          <div class="tuile-kpi">
-            <mat-icon>sports_tennis</mat-icon>
-            <p class="kpi-valeur">{{ stats.matchsJoues }}</p>
-            <p class="kpi-label">Matchs joués</p>
-          </div>
-          <div class="tuile-kpi">
-            <mat-icon>event_upcoming</mat-icon>
-            <p class="kpi-valeur">{{ stats.reservationsAVenir }}</p>
-            <p class="kpi-label">À venir</p>
-          </div>
-          <div class="tuile-kpi">
-            <mat-icon>lock</mat-icon>
-            <p class="kpi-valeur">{{ stats.matchsPrives }}</p>
-            <p class="kpi-label">Privés</p>
-          </div>
-          <div class="tuile-kpi">
-            <mat-icon>public</mat-icon>
-            <p class="kpi-valeur">{{ stats.matchsPublics }}</p>
-            <p class="kpi-label">Publics</p>
-          </div>
-        </div>
-      }
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Mes réservations -->
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title><mat-icon style="vertical-align: middle;">event</mat-icon> Mes réservations</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="grille-reservations">
-        @for (r of reservations; track r.idParticipation) {
-          <div class="carte-terrain">
-            <p style="margin: 0.15rem 0;">📅 {{ r.dateMatch | date:'dd/MM/yyyy HH:mm' }}</p>
-            <p style="margin: 0.15rem 0;">🎾 {{ r.terrainNumero }}</p>
-            <p style="margin: 0.15rem 0;">📍 {{ r.siteNom }}</p>
-            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem;">
-              <app-badge [texte]="r.statutMatch" [type]="r.statutMatch"></app-badge>
-              @if (r.estOrganisateur) {
-                <app-badge texte="ORGANISATEUR" type="ORGANISATEUR"></app-badge>
+            <h4>Historique des paiements</h4>
+            <div class="grille-historique">
+              @for (h of historiquePaiements; track h.idParticipation) {
+                <div class="carte-historique">
+                  <p style="margin: 0.15rem 0; font-size: 1.2rem; font-weight: 600;">{{ h.montant }} €</p>
+                  <p style="margin: 0.15rem 0; color: #999; font-size: 0.85rem;">{{ h.dateMatch | date:'dd/MM/yyyy' }}</p>
+                  <p style="margin: 0.15rem 0; font-size: 0.85rem;">{{ h.statutMatch === 'PRIVE' ? 'Match privé' : 'Match public' }}</p>
+                  <app-badge
+                    [texte]="h.datePaiement ? 'PAYÉ' : 'NON PAYÉ'"
+                    [type]="h.datePaiement ? 'PAYE' : 'NON_PAYE'">
+                  </app-badge>
+                  @if (!h.datePaiement) {
+                    <button mat-button color="primary" (click)="payer(h.idParticipation)" style="display: block; margin-top: 0.5rem; padding: 0;">
+                      💳 Payer
+                    </button>
+                  }
+                </div>
+              } @empty {
+                <p style="color: #999;">Aucun paiement pour l'instant.</p>
               }
-              <app-badge
-                [texte]="r.aPaye ? 'PAYÉ' : 'NON PAYÉ'"
-                [type]="r.aPaye ? 'PAYE' : 'NON_PAYE'">
-              </app-badge>
             </div>
-          </div>
-        } @empty {
-          <p style="color: #999;">Aucune réservation pour l'instant.</p>
-        }
+          </mat-card-content>
+        </mat-card>
+
       </div>
-    </mat-card-content>
-  </mat-card>
+    </mat-tab>
+
+    <!-- Onglet 2 : Statistiques -->
+    <mat-tab label="📊 Statistiques">
+      <div style="padding-top: 1.5rem;">
+        <mat-card>
+          <mat-card-content>
+            @if (stats) {
+              <div class="grille-kpi">
+                <div class="tuile-kpi">
+                  <mat-icon>sports_tennis</mat-icon>
+                  <p class="kpi-valeur">{{ stats.matchsJoues }}</p>
+                  <p class="kpi-label">Matchs joués</p>
+                </div>
+                <div class="tuile-kpi">
+                  <mat-icon>event_upcoming</mat-icon>
+                  <p class="kpi-valeur">{{ stats.reservationsAVenir }}</p>
+                  <p class="kpi-label">À venir</p>
+                </div>
+                <div class="tuile-kpi">
+                  <mat-icon>lock</mat-icon>
+                  <p class="kpi-valeur">{{ stats.matchsPrives }}</p>
+                  <p class="kpi-label">Privés</p>
+                </div>
+                <div class="tuile-kpi">
+                  <mat-icon>public</mat-icon>
+                  <p class="kpi-valeur">{{ stats.matchsPublics }}</p>
+                  <p class="kpi-label">Publics</p>
+                </div>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Onglet 3 : Mes réservations -->
+    <mat-tab label="📅 Mes réservations">
+      <div style="padding-top: 1.5rem;">
+        <mat-card>
+          <mat-card-content>
+            <div class="grille-reservations">
+              @for (r of reservations; track r.idParticipation) {
+                <div class="carte-terrain">
+                  <p style="margin: 0.15rem 0;">📅 {{ r.dateMatch | date:'dd/MM/yyyy HH:mm' }}</p>
+                  <p style="margin: 0.15rem 0;">🎾 {{ r.terrainNumero }}</p>
+                  <p style="margin: 0.15rem 0;">📍 {{ r.siteNom }}</p>
+                  <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                    <app-badge [texte]="r.statutMatch" [type]="r.statutMatch"></app-badge>
+                    @if (r.estOrganisateur) {
+                      <app-badge texte="ORGANISATEUR" type="ORGANISATEUR"></app-badge>
+                    }
+                    <app-badge
+                      [texte]="r.aPaye ? 'PAYÉ' : 'NON PAYÉ'"
+                      [type]="r.aPaye ? 'PAYE' : 'NON_PAYE'">
+                    </app-badge>
+                  </div>
+                </div>
+              } @empty {
+                <p style="color: #999;">Aucune réservation pour l'instant.</p>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
 
 </div>
