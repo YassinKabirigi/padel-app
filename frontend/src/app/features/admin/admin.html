@@ -115,4 +115,36 @@
     </div>
 
   </div>
+
+  <div style="margin-top: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2>Jours de fermeture</h2>
+      <button mat-raised-button color="primary" (click)="ouvrirDialogFermeture(null)">
+        <mat-icon>add</mat-icon> Nouvelle fermeture
+      </button>
+    </div>
+
+    <mat-card>
+      <mat-card-content>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem;">
+          @for (f of fermetures; track f.idFermeture) {
+            <div class="carte-terrain">
+              <p style="margin: 0.15rem 0;">📅 {{ f.dateFermeture | date:'dd/MM/yyyy' }}</p>
+              <p style="margin: 0.15rem 0;">{{ f.motif }}</p>
+              <p style="margin: 0.15rem 0; color: #999; font-size: 0.85rem;">
+                {{ f.siteNom ? '📍 ' + f.siteNom : '🌍 Fermeture globale' }}
+              </p>
+              <div style="margin-top: 0.5rem;">
+                <button mat-button (click)="ouvrirDialogFermeture(f)">Modifier</button>
+                <button mat-button color="warn" (click)="supprimerFermeture(f.idFermeture)">Supprimer</button>
+              </div>
+            </div>
+          } @empty {
+            <p style="color: #999;">Aucune fermeture programmée.</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
 </div>

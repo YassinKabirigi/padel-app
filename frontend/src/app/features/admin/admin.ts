@@ -6,6 +6,7 @@ import { Terrain, TerrainModel } from '../../core/services/terrain';
 import { Participation, ParticipationDetailModel } from '../../core/services/participation';
 import { Membre } from '../../core/services/membre';
 import { Administrateur } from '../../core/services/administrateur';
+import { JourFermeture, JourFermetureModel } from '../../core/services/jour-fermeture';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,6 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Badge } from '../../shared/badge/badge';
 import { SiteDialog } from './site-dialog/site-dialog';
 import { TerrainDialog } from './terrain-dialog/terrain-dialog';
+import { JourFermetureDialog } from './jour-fermeture-dialog/jour-fermeture-dialog';
 
 @Component({
   selector: 'app-admin',
@@ -38,6 +40,7 @@ export class Admin implements OnInit {
   sites: SiteModel[] = [];
   terrains: TerrainModel[] = [];
   participations: ParticipationDetailModel[] = [];
+  fermetures: JourFermetureModel[] = [];
   nbMembres = 0;
   nbAdministrateurs = 0;
 
@@ -50,6 +53,7 @@ export class Admin implements OnInit {
     private participationService: Participation,
     private membreService: Membre,
     private administrateurService: Administrateur,
+    private jourFermetureService: JourFermeture,
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) {}
@@ -93,6 +97,9 @@ export class Admin implements OnInit {
     });
     this.administrateurService.getAllAdministrateurs().subscribe({
       next: (data) => { this.nbAdministrateurs = data.length; this.cdr.detectChanges(); }
+    });
+    this.jourFermetureService.getAllFermetures().subscribe({
+      next: (data) => { this.fermetures = data; this.cdr.detectChanges(); }
     });
   }
 
@@ -190,6 +197,48 @@ export class Admin implements OnInit {
           this.afficherErreur('Erreur lors de la suppression');
         }
         this.chargerDonnees();
+      }
+    });
+  }
+
+  ouvrirDialogFermeture(fermeture: JourFermetureModel | null): void {
+    const dialogRef = this.dialog.open(JourFermetureDialog, {
+      width: '450px',
+      data: { fermeture, sites: this.sites }
+    });
+
+    dialogRef.afterClosed().subscribe((resultat) => {
+      if (!resultat) {
+        return;
+      }
+
+      const operation = fermeture
+        ? this.jourFermetureService.updateFermeture(fermeture.idFermeture, resultat)
+        : this.jourFermetureService.createFermeture(resultat);
+
+      operation.subscribe({
+        next: () => {
+          this.afficherSucces(fermeture ? 'Fermeture modifiée avec succès' : 'Fermeture créée avec succès');
+          this.chargerDonnees();
+        },
+        error: (err) => {
+          this.afficherErreur(err.error?.erreur || 'Erreur lors de l\'opération');
+        }
+      });
+    });
+  }
+
+  supprimerFermeture(id: number): void {
+    if (!confirm('Confirmer la suppression de cette fermeture ?')) {
+      return;
+    }
+    this.jourFermetureService.deleteFermeture(id).subscribe({
+      next: () => {
+        this.afficherSucces('Fermeture supprimée');
+        this.chargerDonnees();
+      },
+      error: () => {
+        this.afficherErreur('Erreur lors de la suppression');
       }
     });
   }

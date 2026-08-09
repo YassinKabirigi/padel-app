@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>{{ data.fermeture ? 'Modifier la fermeture' : 'Nouvelle fermeture' }}</h2>
+
+<mat-dialog-content>
+  <div style="margin-bottom: 1rem;">
+    <label style="display: block; margin-bottom: 0.25rem;">Date</label>
+    <input type="date" [(ngModel)]="dateFermeture" name="dateFermeture" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
+  </div>
+
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Motif</mat-label>
+    <input matInput [(ngModel)]="motif" name="motif" placeholder="Ex: Jour férié, maintenance..." />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Site (laisser vide = fermeture globale)</mat-label>
+    <mat-select [(ngModel)]="idSite" name="idSite">
+      <mat-option [value]="null">-- Fermeture globale --</mat-option>
+      @for (site of data.sites; track site.idSite) {
+        <mat-option [value]="site.idSite">{{ site.nom }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onAnnuler()">Annuler</button>
+  <button mat-raised-button color="primary" (click)="onValider()">Valider</button>
+</mat-dialog-actions>
