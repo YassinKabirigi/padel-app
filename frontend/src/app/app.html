@@ -9,9 +9,14 @@
     <a mat-button routerLink="/reservation">
       <mat-icon>event</mat-icon> Réservation
     </a>
-    <a mat-button routerLink="/admin">
-      <mat-icon>settings</mat-icon> Terrains
-    </a>
+    @if (estAdmin()) {
+      <a mat-button routerLink="/admin">
+        <mat-icon>settings</mat-icon> Terrains
+      </a>
+      <a mat-button routerLink="/membres">
+        <mat-icon>people</mat-icon> Membres
+      </a>
+    }
     <button mat-button (click)="onLogout()">
       <mat-icon>logout</mat-icon> Déconnexion
     </button>

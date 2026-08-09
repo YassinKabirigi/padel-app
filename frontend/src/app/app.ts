@@ -16,6 +16,10 @@ export class App {
 
   constructor(public auth: Auth, private router: Router) {}
 
+  estAdmin(): boolean {
+    const type = this.auth.getTypeMembre();
+    return !!type && type.startsWith('ADMIN_');
+  }
   onLogout(): void {
     this.auth.logout();
     this.router.navigate(['/login']);
