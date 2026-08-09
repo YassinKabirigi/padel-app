@@ -1,61 +1,75 @@
 <div class="page-container">
-  <mat-card style="margin-bottom: 2rem;">
-    <mat-card-header>
-      <mat-card-title>Réserver un match</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Terrain</mat-label>
-          <mat-select [(ngModel)]="idTerrainSelectionne" name="terrain">
-            @for (terrain of terrains; track terrain.idTerrain) {
-              <mat-option [value]="terrain.idTerrain">
-                {{ terrain.site.nom }} — {{ terrain.numero }}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
 
-        <div style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 0.25rem;">Date</label>
-          <input type="date" [(ngModel)]="date" name="date" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;" />
-        </div>
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Réserver un match</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" style="width: 100%;">
+            <mat-label>Terrain</mat-label>
+            <mat-select [(ngModel)]="idTerrainSelectionne" name="terrain">
+              @for (terrain of terrains; track terrain.idTerrain) {
+                <mat-option [value]="terrain.idTerrain">
+                  {{ terrain.site.nom }} — {{ terrain.numero }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
 
-        <div style="margin-bottom: 1rem;">
-          <label style="display: block; margin-bottom: 0.25rem;">Heure</label>
-          <input type="time" [(ngModel)]="heure" name="heure" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;" />
-        </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.25rem;">Date</label>
+            <input type="date" [(ngModel)]="date" name="date" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
+          </div>
 
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Type de match</mat-label>
-          <mat-select [(ngModel)]="statut" name="statut">
-            <mat-option value="PRIVE">Privé</mat-option>
-            <mat-option value="PUBLIC">Public</mat-option>
-          </mat-select>
-        </mat-form-field>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.25rem;">Heure</label>
+            <input type="time" [(ngModel)]="heure" name="heure" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
+          </div>
 
-        @if (erreur) {
-          <p style="color: #c62828;">{{ erreur }}</p>
+          <mat-form-field appearance="outline" style="width: 100%;">
+            <mat-label>Type de match</mat-label>
+            <mat-select [(ngModel)]="statut" name="statut">
+              <mat-option value="PRIVE">Privé</mat-option>
+              <mat-option value="PUBLIC">Public</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          @if (erreur) {
+            <p style="color: #ef5350;">{{ erreur }}</p>
+          }
+          @if (succes) {
+            <p style="color: #66bb6a;">{{ succes }}</p>
+          }
+
+          <button mat-raised-button color="primary" type="submit" [disabled]="chargement" style="width: 100%;">
+            {{ chargement ? 'Envoi...' : 'Réserver' }}
+          </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Terrains disponibles</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @for (terrain of terrains; track terrain.idTerrain) {
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid #333;">
+            <span>
+              <mat-icon style="vertical-align: middle; font-size: 20px;">sports_tennis</mat-icon>
+              {{ terrain.numero }}
+            </span>
+            <span style="background: #00bcd4; color: white; padding: 0.15rem 0.6rem; border-radius: 12px; font-size: 0.8rem;">
+              {{ terrain.site.nom }}
+            </span>
+          </div>
+        } @empty {
+          <p style="color: #999;">Aucun terrain disponible.</p>
         }
-        @if (succes) {
-          <p style="color: #2e7d32;">{{ succes }}</p>
-        }
+      </mat-card-content>
+    </mat-card>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="chargement" style="width: 100%;">
-          {{ chargement ? 'Envoi...' : 'Réserver' }}
-        </button>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Terrains disponibles</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      @for (terrain of terrains; track terrain.idTerrain) {
-        <p>{{ terrain.site.nom }} — {{ terrain.numero }}</p>
-      }
-    </mat-card-content>
-  </mat-card>
+  </div>
 </div>

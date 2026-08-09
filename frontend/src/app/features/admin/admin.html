@@ -56,32 +56,27 @@
       <mat-card-title>Réservations</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-        <tr style="text-align: left; border-bottom: 2px solid #444;">
-          <th style="padding: 0.5rem;">Membre</th>
-          <th style="padding: 0.5rem;">Match</th>
-          <th style="padding: 0.5rem;">Terrain</th>
-          <th style="padding: 0.5rem;">Statut</th>
-          <th style="padding: 0.5rem;">Organisateur</th>
-          <th style="padding: 0.5rem;">Paiement</th>
-        </tr>
-        </thead>
-        <tbody>
-          @for (p of participations; track p.idParticipation) {
-            <tr style="border-bottom: 1px solid #333;">
-              <td style="padding: 0.5rem;">{{ p.matriculeMembre }} — {{ p.nomMembre }}</td>
-              <td style="padding: 0.5rem;">{{ p.dateMatch | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td style="padding: 0.5rem;">{{ p.siteNom }} — {{ p.terrainNumero }}</td>
-              <td style="padding: 0.5rem;">{{ p.statutMatch }}</td>
-              <td style="padding: 0.5rem;">{{ p.estOrganisateur ? 'Oui' : 'Non' }}</td>
-              <td style="padding: 0.5rem;" [style.color]="p.aPaye ? '#66bb6a' : '#ef5350'">
-                {{ p.aPaye ? p.montantPaye : 'Non payé' }}
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+        @for (p of participations; track p.idParticipation) {
+          <mat-card style="background: rgba(255,255,255,0.04);">
+            <mat-card-content>
+              <p style="margin: 0.15rem 0;">📅 {{ p.dateMatch | date:'dd/MM/yyyy HH:mm' }}</p>
+              <p style="margin: 0.15rem 0;">🎾 {{ p.terrainNumero }}</p>
+              <p style="margin: 0.15rem 0;">📍 {{ p.siteNom }}</p>
+              <p style="margin: 0.15rem 0;">{{ p.statutMatch === 'PRIVE' ? 'Match privé' : 'Match public' }}</p>
+              <p style="margin: 0.15rem 0;">👤 {{ p.matriculeMembre }} — {{ p.nomMembre }}</p>
+              @if (p.estOrganisateur) {
+                <p style="margin: 0.15rem 0; color: #7c4dff;">Organisateur</p>
+              }
+              <p style="margin: 0.15rem 0;" [style.color]="p.aPaye ? '#66bb6a' : '#ef5350'">
+                {{ p.aPaye ? 'Payé (' + p.montantPaye + ')' : 'Paiement non effectué' }}
+              </p>
+            </mat-card-content>
+          </mat-card>
+        } @empty {
+          <p style="color: #999;">Aucune réservation pour l'instant.</p>
+        }
+      </div>
     </mat-card-content>
   </mat-card>
 </div>
