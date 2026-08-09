@@ -14,6 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 import { Badge } from '../../shared/badge/badge';
 import { SiteDialog } from './site-dialog/site-dialog';
 import { TerrainDialog } from './terrain-dialog/terrain-dialog';
@@ -31,6 +32,7 @@ import { JourFermetureDialog } from './jour-fermeture-dialog/jour-fermeture-dial
     MatButtonModule,
     MatDialogModule,
     MatIconModule,
+    MatTabsModule,
     Badge
   ],
   templateUrl: './admin.html',
