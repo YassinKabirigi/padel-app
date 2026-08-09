@@ -1,13 +1,14 @@
 package be.ephec.padel_backend.dto;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 public class CreerMatchRequest {
 
     private Integer idTerrain;
-    private LocalDateTime dateHeureDebut;
-    private String statut; // "PRIVE" ou "PUBLIC"
+    private String dateHeureDebut;
+    private String statut;
     private String matriculeOrganisateur;
+    private List<String> matriculesCoequipiers;
 
     public CreerMatchRequest() {
     }
@@ -20,11 +21,11 @@ public class CreerMatchRequest {
         this.idTerrain = idTerrain;
     }
 
-    public LocalDateTime getDateHeureDebut() {
+    public String getDateHeureDebut() {
         return dateHeureDebut;
     }
 
-    public void setDateHeureDebut(LocalDateTime dateHeureDebut) {
+    public void setDateHeureDebut(String dateHeureDebut) {
         this.dateHeureDebut = dateHeureDebut;
     }
 
@@ -42,5 +43,13 @@ public class CreerMatchRequest {
 
     public void setMatriculeOrganisateur(String matriculeOrganisateur) {
         this.matriculeOrganisateur = matriculeOrganisateur;
+    }
+
+    public List<String> getMatriculesCoequipiers() {
+        return matriculesCoequipiers;
+    }
+
+    public void setMatriculesCoequipiers(List<String> matriculesCoequipiers) {
+        this.matriculesCoequipiers = matriculesCoequipiers;
     }
 }

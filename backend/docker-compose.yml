@@ -4,12 +4,27 @@
     container_name: padel-db
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "TonMotDePasse123!"
+      MSSQL_SA_PASSWORD: "PadelSecure2026!"
       MSSQL_PID: "Developer"
     ports:
       - "1433:1433"
     volumes:
       - mssql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"PadelSecure2026!\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: >
+      /opt/mssql-tools18/bin/sqlcmd -S db -U sa -P "PadelSecure2026!" -C
+      -Q "IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'padel') CREATE DATABASE padel"
 
 volumes:
   mssql_data:

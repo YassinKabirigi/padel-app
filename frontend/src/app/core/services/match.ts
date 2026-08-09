@@ -15,6 +15,16 @@ export interface MatchModel {
   statut: string;
 }
 
+export interface MatchDisponibleModel {
+  idMatch: number;
+  dateHeureDebut: string;
+  terrainNumero: string;
+  siteNom: string;
+  statut: string;
+  nbParticipants: number;
+  dejaParticipant: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -23,7 +33,21 @@ export class Match {
 
   constructor(private http: HttpClient) {}
 
-  creerMatch(request: CreerMatchRequest): Observable<MatchModel> {
-    return this.http.post<MatchModel>(this.apiUrl, request);
+  creerMatch(match: {
+    idTerrain: number;
+    dateHeureDebut: string;
+    statut: string;
+    matriculeOrganisateur: string;
+    matriculesCoequipiers?: string[];
+  }): Observable<any> {
+    return this.http.post<any>(this.apiUrl, match);
+  }
+
+  getMatchsDisponibles(): Observable<MatchDisponibleModel[]> {
+    return this.http.get<MatchDisponibleModel[]>(`${this.apiUrl}/disponibles`);
+  }
+
+  rejoindreMatch(idMatch: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${idMatch}/rejoindre`, {});
   }
 }

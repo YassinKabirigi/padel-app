@@ -1,4 +1,11 @@
-<div class="page-container">
+<div class="page-container-large">
+  @if (erreur) {
+    <p style="color: #ef5350;">{{ erreur }}</p>
+  }
+  @if (succes) {
+    <p style="color: #66bb6a;">{{ succes }}</p>
+  }
+
   <div class="layout-reservation">
 
     <mat-card>
@@ -46,12 +53,36 @@
             </div>
           </div>
 
-          @if (erreur) {
-            <p style="color: #ef5350;">{{ erreur }}</p>
-          }
-          @if (succes) {
-            <p style="color: #66bb6a;">{{ succes }}</p>
-          }
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: #999; font-size: 0.85rem;">
+              Coéquipiers (optionnel, max 3)
+            </label>
+
+            @if (coequipiers.length > 0) {
+              <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem;">
+                @for (matricule of coequipiers; track matricule) {
+                  <span style="background: rgba(124,77,255,0.15); border: 1px solid #7c4dff; border-radius: 12px; padding: 0.2rem 0.6rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.3rem;">
+                    {{ matricule }}
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px; cursor: pointer;" (click)="retirerCoequipier(matricule)">close</mat-icon>
+                  </span>
+                }
+              </div>
+            }
+
+            @if (coequipiers.length < 3) {
+              <div style="display: flex; gap: 0.5rem;">
+                <input
+                  type="text"
+                  [(ngModel)]="nouveauCoequipier"
+                  name="nouveauCoequipier"
+                  placeholder="Matricule (ex: G1043)"
+                  style="flex: 1; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
+                <button mat-button type="button" (click)="ajouterCoequipier()">
+                  <mat-icon>add</mat-icon> Ajouter
+                </button>
+              </div>
+            }
+          </div>
 
           <button
             mat-raised-button
@@ -84,5 +115,36 @@
       </mat-card-content>
     </mat-card>
 
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title><mat-icon style="vertical-align: middle;">group_add</mat-icon> Rejoindre un match</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          @for (m of matchsDisponibles; track m.idMatch) {
+            <div class="carte-terrain">
+              <p style="margin: 0.15rem 0;">📅 {{ m.dateHeureDebut | date:'dd/MM/yyyy HH:mm' }}</p>
+              <p style="margin: 0.15rem 0;">🎾 {{ m.terrainNumero }}</p>
+              <p style="margin: 0.15rem 0;">📍 {{ m.siteNom }}</p>
+              <div style="display: flex; gap: 0.4rem; align-items: center; margin: 0.4rem 0;">
+                <app-badge [texte]="m.statut" [type]="m.statut"></app-badge>
+                <span style="color: #999; font-size: 0.85rem;">{{ m.nbParticipants }}/4</span>
+              </div>
+              @if (m.dejaParticipant) {
+                <p style="color: #66bb6a; font-size: 0.85rem; margin: 0.3rem 0 0 0;">✓ Déjà inscrit</p>
+              } @else {
+                <button mat-raised-button color="primary" (click)="rejoindre(m.idMatch)" style="width: 100%; margin-top: 0.5rem;">
+                  Rejoindre
+                </button>
+              }
+            </div>
+          } @empty {
+            <p style="color: #999;">Aucun match disponible.</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
   </div>
+
 </div>

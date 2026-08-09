@@ -8,7 +8,7 @@ import be.ephec.padel_backend.repository.ParticipationRepository;
 import be.ephec.padel_backend.repository.TerrainRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import be.ephec.padel_backend.dto.MatchDisponibleDto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -138,12 +138,15 @@ public class ReservationService {
     }
 
     /**
-     * Orchestration complete : verifie toutes les regles puis cree le match
-     * et la participation de l'organisateur. Leve une IllegalStateException
-     * avec un message explicite si une regle n'est pas respectee.
+     * Orchestration complete : verifie toutes les regles puis cree le match,
+     * la participation de l'organisateur, et optionnellement les participations
+     * des coequipiers ajoutes directement a la creation. Leve une
+     * IllegalStateException avec un message explicite si une regle n'est pas
+     * respectee.
      */
     public Match creerMatch(Integer idTerrain, LocalDateTime dateHeureDebut,
-                            Match.Statut statut, String matriculeOrganisateur) {
+                            Match.Statut statut, String matriculeOrganisateur,
+                            List<String> matriculesCoequipiers) {
 
         Terrain terrain = terrainRepository.findById(idTerrain)
                 .orElseThrow(() -> new IllegalStateException("Terrain introuvable"));
@@ -167,6 +170,27 @@ public class ReservationService {
             throw new IllegalStateException("Creneau non disponible");
         }
 
+        List<String> coequipiers = matriculesCoequipiers != null ? matriculesCoequipiers : List.of();
+
+        if (coequipiers.size() > 3) {
+            throw new IllegalStateException("Un match ne peut avoir plus de 4 participants au total");
+        }
+
+        if (coequipiers.stream().distinct().count() != coequipiers.size()) {
+            throw new IllegalStateException("Un meme membre ne peut pas etre ajoute plusieurs fois");
+        }
+
+        if (coequipiers.contains(matriculeOrganisateur)) {
+            throw new IllegalStateException("L'organisateur ne peut pas etre ajoute comme coequipier");
+        }
+
+        List<Membre> membresCoequipiers = new java.util.ArrayList<>();
+        for (String matricule : coequipiers) {
+            Membre coequipier = membreRepository.findById(matricule)
+                    .orElseThrow(() -> new IllegalStateException("Coequipier introuvable : " + matricule));
+            membresCoequipiers.add(coequipier);
+        }
+
         Match match = new Match();
         match.setTerrain(terrain);
         match.setDateHeureDebut(dateHeureDebut);
@@ -180,6 +204,96 @@ public class ReservationService {
         participationOrganisateur.setDateInscription(LocalDateTime.now());
         participationRepository.save(participationOrganisateur);
 
+        for (Membre coequipier : membresCoequipiers) {
+            Participation participationCoequipier = new Participation();
+            participationCoequipier.setMatch(matchSauvegarde);
+            participationCoequipier.setMembre(coequipier);
+            participationCoequipier.setEstOrganisateur(false);
+            participationCoequipier.setDateInscription(LocalDateTime.now());
+            participationRepository.save(participationCoequipier);
+        }
+
         return matchSauvegarde;
     }
+    /**
+     * Retourne la liste des matchs qui ne sont pas encore complets (moins de 4
+     * participants), avec indication si le membre connecte y participe deja.
+     */
+    public List<MatchDisponibleDto> getMatchsDisponibles(String matriculeMembreConnecte) {
+        List<Match> tousLesMatchs = matchRepository.findAll();
+
+        return tousLesMatchs.stream()
+                .map(match -> {
+                    List<Participation> participations = participationRepository.findAll().stream()
+                            .filter(p -> p.getMatch().getIdMatch().equals(match.getIdMatch()))
+                            .toList();
+
+                    boolean dejaParticipant = participations.stream()
+                            .anyMatch(p -> p.getMembre().getMatricule().equals(matriculeMembreConnecte));
+
+                    return new MatchDisponibleDto(
+                            match.getIdMatch(),
+                            match.getDateHeureDebut(),
+                            match.getTerrain().getNumero(),
+                            match.getTerrain().getSite().getNom(),
+                            match.getStatut().name(),
+                            participations.size(),
+                            dejaParticipant
+                    );
+                })
+                .filter(dto -> dto.getNbParticipants() < 4 && dto.getDateHeureDebut().isAfter(LocalDateTime.now()))
+                .sorted((a, b) -> a.getDateHeureDebut().compareTo(b.getDateHeureDebut()))
+                .toList();
+    }
+
+    /**
+     * Permet a un membre de rejoindre un match existant en tant que participant
+     * (pas organisateur). Verifie les memes regles metier que pour la creation
+     * d'un match (penalite, delai, terrain autorise), plus l'absence de doublon
+     * et la disponibilite d'une place.
+     */
+    public Participation rejoindreMatch(Integer idMatch, String matricule) {
+        Match match = matchRepository.findById(idMatch)
+                .orElseThrow(() -> new IllegalStateException("Match introuvable"));
+
+        Membre membre = membreRepository.findById(matricule)
+                .orElseThrow(() -> new IllegalStateException("Membre introuvable"));
+
+        if (isPenaliteActive(membre)) {
+            throw new IllegalStateException("Le membre a une penalite active");
+        }
+
+        if (!isDelaiRespecte(membre, match.getDateHeureDebut())) {
+            throw new IllegalStateException("Delai de reservation non respecte pour ce type de membre");
+        }
+
+        if (!isTerrainAutorise(membre, match.getTerrain())) {
+            throw new IllegalStateException("Ce membre ne peut pas reserver sur ce terrain");
+        }
+
+        List<Participation> participationsExistantes = participationRepository.findAll().stream()
+                .filter(p -> p.getMatch().getIdMatch().equals(idMatch))
+                .toList();
+
+        if (participationsExistantes.size() >= 4) {
+            throw new IllegalStateException("Ce match est deja complet");
+        }
+
+        boolean dejaParticipant = participationsExistantes.stream()
+                .anyMatch(p -> p.getMembre().getMatricule().equals(matricule));
+        if (dejaParticipant) {
+            throw new IllegalStateException("Vous participez deja a ce match");
+        }
+
+        Participation participation = new Participation();
+        participation.setMatch(match);
+        participation.setMembre(membre);
+        participation.setEstOrganisateur(false);
+        participation.setDateInscription(LocalDateTime.now());
+
+        return participationRepository.save(participation);
+    }
+
+
+
 }
