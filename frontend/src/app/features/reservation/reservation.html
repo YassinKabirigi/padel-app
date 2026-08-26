@@ -27,12 +27,13 @@
 
           <div style="margin-bottom: 1rem;">
             <label style="display: block; margin-bottom: 0.25rem;">Date</label>
-            <input type="date" [(ngModel)]="date" name="date" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
+            <input type="date" [(ngModel)]="date" name="date" [min]="aujourdhui" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
           </div>
 
           <div style="margin-bottom: 1rem;">
             <label style="display: block; margin-bottom: 0.25rem;">Heure</label>
-            <input type="time" [(ngModel)]="heure" name="heure" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
+            <input type="time" [(ngModel)]="heure" name="heure" step="1800" style="width: 100%; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
+            <small style="color: #999; font-size: 0.78rem;">Créneaux toutes les 30 minutes</small>
           </div>
 
           <div style="margin-bottom: 1rem;">
@@ -77,8 +78,12 @@
                   name="nouveauCoequipier"
                   placeholder="Matricule (ex: G1043)"
                   style="flex: 1; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
-                <button mat-button type="button" (click)="ajouterCoequipier()">
-                  <mat-icon>add</mat-icon> Ajouter
+                <button mat-button type="button" (click)="ajouterCoequipier()" [disabled]="verificationCoequipier">
+                  @if (verificationCoequipier) {
+                    <mat-icon>hourglass_empty</mat-icon> Vérification...
+                  } @else {
+                    <mat-icon>add</mat-icon> Ajouter
+                  }
                 </button>
               </div>
             }

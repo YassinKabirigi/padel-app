@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Terrain, TerrainModel } from '../../core/services/terrain';
 import { Match, MatchDisponibleModel } from '../../core/services/match';
 import { Auth } from '../../core/services/auth';
+import { Membre } from '../../core/services/membre';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -23,6 +24,10 @@ export class Reservation implements OnInit {
   matchsDisponibles: MatchDisponibleModel[] = [];
   filtreStatut: string = 'TOUS';
 
+  get aujourdhui(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
   get matchsFiltres(): MatchDisponibleModel[] {
     if (this.filtreStatut === 'TOUS') return this.matchsDisponibles;
     return this.matchsDisponibles.filter(m => m.statut === this.filtreStatut);
@@ -38,11 +43,13 @@ export class Reservation implements OnInit {
   erreur: string = '';
   succes: string = '';
   chargement: boolean = false;
+  verificationCoequipier: boolean = false;
 
   constructor(
     private terrainService: Terrain,
     private matchService: Match,
     private authService: Auth,
+    private membreService: Membre,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -73,6 +80,14 @@ export class Reservation implements OnInit {
   ajouterCoequipier(): void {
     const matricule = this.nouveauCoequipier.trim().toUpperCase();
     if (!matricule) {
+      this.erreur = 'Veuillez saisir un matricule';
+      this.cdr.detectChanges();
+      return;
+    }
+    // Item 11 : validation format matricule (G/S/L + 4 chiffres)
+    if (!/^[GSL]\d{4}$/.test(matricule)) {
+      this.erreur = 'Format invalide — matricule : G/S/L suivi de 4 chiffres (ex: G1042)';
+      this.cdr.detectChanges();
       return;
     }
     if (this.coequipiers.includes(matricule)) {
@@ -85,10 +100,29 @@ export class Reservation implements OnInit {
       this.cdr.detectChanges();
       return;
     }
-    this.coequipiers.push(matricule);
-    this.nouveauCoequipier = '';
+    // Item 12 : vérification existence du membre avant ajout
+    this.verificationCoequipier = true;
     this.erreur = '';
     this.cdr.detectChanges();
+    this.membreService.getMembreByMatricule(matricule).subscribe({
+      next: (membre) => {
+        this.coequipiers.push(matricule);
+        this.nouveauCoequipier = '';
+        this.succes = `✓ ${membre.prenom} ${membre.nom} ajouté`;
+        this.verificationCoequipier = false;
+        this.cdr.detectChanges();
+        setTimeout(() => { this.succes = ''; this.cdr.detectChanges(); }, 3000);
+      },
+      error: (err) => {
+        this.verificationCoequipier = false;
+        if (err.status === 404) {
+          this.erreur = `Membre introuvable : ${matricule}`;
+        } else {
+          this.erreur = 'Erreur lors de la vérification du membre';
+        }
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   retirerCoequipier(matricule: string): void {
@@ -99,8 +133,22 @@ export class Reservation implements OnInit {
     this.erreur = '';
     this.succes = '';
 
-    if (!this.idTerrainSelectionne || !this.date || !this.heure) {
-      this.erreur = 'Veuillez remplir tous les champs';
+    if (!this.idTerrainSelectionne) {
+      this.erreur = 'Veuillez sélectionner un terrain';
+      return;
+    }
+    if (!this.date) {
+      this.erreur = 'Veuillez saisir une date';
+      return;
+    }
+    if (!this.heure) {
+      this.erreur = 'Veuillez saisir une heure';
+      return;
+    }
+    // Item 11 : vérifier que la date n'est pas dans le passé
+    const dateChoisie = new Date(this.date + 'T' + this.heure);
+    if (dateChoisie <= new Date()) {
+      this.erreur = 'La date et l\'heure doivent être dans le futur';
       return;
     }
 

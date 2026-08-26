@@ -39,4 +39,8 @@ export class Membre {
   deleteMembre(matricule: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${matricule}`);
   }
+
+  getMembreByMatricule(matricule: string): Observable<MembreModel> {
+    return this.http.get<MembreModel>(`${this.apiUrl}/${matricule}`);
+  }
 }
