@@ -151,6 +151,12 @@ export class Reservation implements OnInit {
       this.erreur = 'La date et l\'heure doivent être dans le futur';
       return;
     }
+    // Item 10 : vérifier que l'heure est un créneau de 30 min (:00 ou :30)
+    const minutes = dateChoisie.getMinutes();
+    if (minutes !== 0 && minutes !== 30) {
+      this.erreur = 'L\'heure doit être un créneau de 30 minutes (ex: 09:00 ou 09:30)';
+      return;
+    }
 
     const matricule = this.authService.getMatricule();
     if (!matricule) {
