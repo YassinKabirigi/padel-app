@@ -79,11 +79,7 @@
                   placeholder="Matricule (ex: G1043)"
                   style="flex: 1; padding: 0.5rem; border: 1px solid #666; border-radius: 4px; background: transparent; color: inherit;" />
                 <button mat-button type="button" (click)="ajouterCoequipier()" [disabled]="verificationCoequipier">
-                  @if (verificationCoequipier) {
-                    <mat-icon>hourglass_empty</mat-icon> Vérification...
-                  } @else {
-                    <mat-icon>add</mat-icon> Ajouter
-                  }
+                  {{ verificationCoequipier ? 'Vérification...' : 'Ajouter' }}
                 </button>
               </div>
             }
