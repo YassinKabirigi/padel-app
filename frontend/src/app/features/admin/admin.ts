@@ -244,4 +244,24 @@ export class Admin implements OnInit {
       }
     });
   }
+
+  get reservationsGroupees(): { cle: string; dateMatch: string; terrainNumero: string; siteNom: string; statutMatch: string; participants: any[] }[] {
+    const map = new Map<string, any>();
+    for (const p of this.participations) {
+      const cle = p.dateMatch + '|' + p.terrainNumero + '|' + p.siteNom;
+      if (!map.has(cle)) {
+        map.set(cle, {
+          cle,
+          dateMatch: p.dateMatch,
+          terrainNumero: p.terrainNumero,
+          siteNom: p.siteNom,
+          statutMatch: p.statutMatch,
+          participants: []
+        });
+      }
+      map.get(cle).participants.push(p);
+    }
+    return Array.from(map.values()).sort((a, b) => a.dateMatch.localeCompare(b.dateMatch));
+  }
+
 }

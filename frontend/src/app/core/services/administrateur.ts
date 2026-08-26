@@ -8,7 +8,7 @@ export interface AdministrateurModel {
   prenom: string;
   email: string;
   typeAdmin: string;
-  site?: { idSite: number } | null;
+  site?: { idSite: number; nom: string } | null;
 }
 
 @Injectable({

@@ -24,9 +24,14 @@ export class Membres implements OnInit {
   sites: SiteModel[] = [];
   membres: MembreModel[] = [];
   membreExpande: string | null = null;
+  adminExpande: number | null = null;
 
   toggleProfil(matricule: string): void {
     this.membreExpande = this.membreExpande === matricule ? null : matricule;
+  }
+
+  toggleAdmin(id: number): void {
+    this.adminExpande = this.adminExpande === id ? null : id;
   }
   administrateurs: AdministrateurModel[] = [];
   penalites: PenaliteModel[] = [];

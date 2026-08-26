@@ -64,16 +64,25 @@
         <mat-card>
           <mat-card-content>
             @for (admin of administrateurs; track admin.idAdmin) {
-              <div class="ligne-item">
+              <div class="ligne-item" style="cursor: pointer;" (click)="toggleAdmin(admin.idAdmin)">
                 <span>
                   ADMIN-{{ admin.idAdmin }} — {{ admin.prenom }} {{ admin.nom }}
                   <app-badge [texte]="admin.typeAdmin" [type]="'ADMIN_' + admin.typeAdmin"></app-badge>
                 </span>
                 <span>
-                  <button mat-icon-button (click)="ouvrirDialogAdministrateur(admin)"><mat-icon>edit</mat-icon></button>
-                  <button mat-icon-button color="warn" (click)="supprimerAdministrateur(admin.idAdmin)"><mat-icon>delete</mat-icon></button>
+                  <button mat-icon-button (click)="toggleAdmin(admin.idAdmin); $event.stopPropagation()">
+                    <mat-icon>{{ adminExpande === admin.idAdmin ? 'expand_less' : 'expand_more' }}</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="ouvrirDialogAdministrateur(admin); $event.stopPropagation()"><mat-icon>edit</mat-icon></button>
+                  <button mat-icon-button color="warn" (click)="supprimerAdministrateur(admin.idAdmin); $event.stopPropagation()"><mat-icon>delete</mat-icon></button>
                 </span>
               </div>
+              @if (adminExpande === admin.idAdmin) {
+                <div style="padding: 0.75rem 1rem 1rem 1rem; background: rgba(33,150,243,0.07); border-radius: 0 0 8px 8px; font-size: 0.9rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1rem;">
+                  <span>📧 <strong>Email :</strong> {{ admin.email }}</span>
+                  <span>📍 <strong>Site :</strong> {{ admin.site?.nom || 'Global (tous les sites)' }}</span>
+                </div>
+              }
             } @empty {
               <p style="color: #999;">Aucun administrateur pour l'instant.</p>
             }
