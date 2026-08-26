@@ -145,7 +145,11 @@
                 <app-badge [texte]="m.statut" [type]="m.statut"></app-badge>
                 <span style="color: #999; font-size: 0.85rem;">{{ m.nbParticipants }}/4</span>
               </div>
-              @if (m.dejaParticipant) {
+              @if (m.estOrganisateur) {
+                <button mat-stroked-button color="warn" (click)="annuler(m.idMatch)" style="width: 100%; margin-top: 0.5rem; font-size: 0.85rem;">
+                  🗑️ Annuler mon match
+                </button>
+              } @else if (m.dejaParticipant) {
                 <p style="color: #66bb6a; font-size: 0.85rem; margin: 0.3rem 0 0 0;">✓ Déjà inscrit</p>
               } @else if (m.peutRejoindre) {
                 <button mat-raised-button color="primary" (click)="rejoindre(m.idMatch)" style="width: 100%; margin-top: 0.5rem;">

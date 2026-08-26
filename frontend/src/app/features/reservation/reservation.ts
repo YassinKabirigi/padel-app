@@ -212,4 +212,24 @@ export class Reservation implements OnInit {
       }
     });
   }
+
+  annuler(idMatch: number): void {
+    if (!confirm('Confirmer l'annulation de ce match ? Tous les participants seront retirés.')) {
+      return;
+    }
+    this.erreur = '';
+    this.succes = '';
+
+    this.matchService.annulerMatch(idMatch).subscribe({
+      next: () => {
+        this.succes = 'Match annulé avec succès.';
+        this.chargerDonnees();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.erreur = err.error?.erreur || 'Impossible d'annuler ce match';
+        this.cdr.detectChanges();
+      }
+    });
+  }
 }

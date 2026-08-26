@@ -241,6 +241,10 @@ public class ReservationService {
                     boolean dejaParticipant = participations.stream()
                             .anyMatch(p -> p.getMembre().getMatricule().equals(matriculeMembreConnecte));
 
+                    boolean estOrganisateur = participations.stream()
+                            .anyMatch(p -> p.getMembre().getMatricule().equals(matriculeMembreConnecte)
+                                    && Boolean.TRUE.equals(p.getEstOrganisateur()));
+
                     // Admin (non trouvé comme membre) peut voir tous les matchs
                     boolean peutRejoindre = membreConnecte == null
                             || isTerrainAutorise(membreConnecte, match.getTerrain());
@@ -253,7 +257,8 @@ public class ReservationService {
                             match.getStatut().name(),
                             participations.size(),
                             dejaParticipant,
-                            peutRejoindre
+                            peutRejoindre,
+                            estOrganisateur
                     );
                 })
                 .filter(dto -> dto.getNbParticipants() < 4
@@ -339,6 +344,33 @@ public class ReservationService {
                         ? p.getPaiement().getMontant().toString() + " EUR"
                         : "Non paye"
         );
+    }
+
+
+    /**
+     * Annule un match : seul l'organisateur peut supprimer son match futur.
+     * Supprime d'abord toutes les participations, puis le match.
+     */
+    public void annulerMatch(Integer idMatch, String matricule) {
+        Match match = matchRepository.findById(idMatch)
+                .orElseThrow(() -> new IllegalArgumentException("Match introuvable"));
+
+        if (match.getDateHeureDebut().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Impossible d'annuler un match passé");
+        }
+
+        Participation participation = participationRepository
+                .findByMatch_IdMatchAndMembre_Matricule(idMatch, matricule)
+                .orElseThrow(() -> new IllegalStateException("Vous n'êtes pas inscrit à ce match"));
+
+        if (!Boolean.TRUE.equals(participation.getEstOrganisateur())) {
+            throw new IllegalStateException("Seul l'organisateur peut annuler le match");
+        }
+
+        // Supprimer toutes les participations puis le match
+        List<Participation> toutes = participationRepository.findByMatch_IdMatch(idMatch);
+        participationRepository.deleteAll(toutes);
+        matchRepository.deleteById(idMatch);
     }
 
 }

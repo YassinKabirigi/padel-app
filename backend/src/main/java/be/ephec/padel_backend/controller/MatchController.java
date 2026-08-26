@@ -55,4 +55,18 @@ public class MatchController {
         Participation participation = reservationService.rejoindreMatch(id, matricule);
         return ResponseEntity.status(201).body(participation);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> annulerMatch(@PathVariable Integer id, Authentication authentication) {
+        String matricule = authentication.getName();
+        try {
+            reservationService.annulerMatch(id, matricule);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("erreur", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

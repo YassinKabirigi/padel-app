@@ -24,6 +24,7 @@ export interface MatchDisponibleModel {
   nbParticipants: number;
   dejaParticipant: boolean;
   peutRejoindre: boolean;
+  estOrganisateur: boolean;
 }
 
 @Injectable({
@@ -50,5 +51,9 @@ export class Match {
 
   rejoindreMatch(idMatch: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/${idMatch}/rejoindre`, {});
+  }
+
+  annulerMatch(idMatch: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${idMatch}`);
   }
 }
