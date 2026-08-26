@@ -20,16 +20,30 @@
         <mat-card>
           <mat-card-content>
             @for (membre of membres; track membre.matricule) {
-              <div class="ligne-item">
+              <div class="ligne-item" style="cursor: pointer;" (click)="toggleProfil(membre.matricule)">
                 <span>
                   {{ membre.matricule }} — {{ membre.prenom }} {{ membre.nom }}
                   <app-badge [texte]="membre.typeMembre" [type]="membre.typeMembre"></app-badge>
                 </span>
                 <span>
-                  <button mat-icon-button (click)="ouvrirDialogMembre(membre)"><mat-icon>edit</mat-icon></button>
-                  <button mat-icon-button color="warn" (click)="supprimerMembre(membre.matricule)"><mat-icon>delete</mat-icon></button>
+                  <button mat-icon-button (click)="toggleProfil(membre.matricule); $event.stopPropagation()">
+                    <mat-icon>{{ membreExpande === membre.matricule ? 'expand_less' : 'expand_more' }}</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="ouvrirDialogMembre(membre); $event.stopPropagation()"><mat-icon>edit</mat-icon></button>
+                  <button mat-icon-button color="warn" (click)="supprimerMembre(membre.matricule); $event.stopPropagation()"><mat-icon>delete</mat-icon></button>
                 </span>
               </div>
+              @if (membreExpande === membre.matricule) {
+                <div style="padding: 0.75rem 1rem 1rem 1rem; background: rgba(124,77,255,0.07); border-radius: 0 0 8px 8px; font-size: 0.9rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1rem;">
+                  <span>📧 <strong>Email :</strong> {{ membre.email }}</span>
+                  <span>📞 <strong>Tél :</strong> {{ membre.telephone || '—' }}</span>
+                  <span>📅 <strong>Inscription :</strong> {{ membre.dateInscription | date:'dd/MM/yyyy' }}</span>
+                  <span>📍 <strong>Site :</strong> {{ membre.site?.nom || 'Tous les sites' }}</span>
+                  @if (membre.dateFinPenalite) {
+                    <span style="color: #ef5350; grid-column: span 2;">⚠️ Pénalité jusqu'au {{ membre.dateFinPenalite | date:'dd/MM/yyyy' }} — {{ membre.motifPenalite }}</span>
+                  }
+                </div>
+              }
             } @empty {
               <p style="color: #999;">Aucun membre pour l'instant.</p>
             }

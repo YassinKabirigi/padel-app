@@ -255,7 +255,9 @@ public class ReservationService {
                             peutRejoindre
                     );
                 })
-                .filter(dto -> dto.getNbParticipants() < 4 && dto.getDateHeureDebut().isAfter(LocalDateTime.now()))
+                .filter(dto -> dto.getNbParticipants() < 4
+                        && dto.getDateHeureDebut().isAfter(LocalDateTime.now())
+                        && (!"PRIVE".equals(dto.getStatut()) || dto.isDejaParticipant()))
                 .sorted((a, b) -> a.getDateHeureDebut().compareTo(b.getDateHeureDebut()))
                 .toList();
     }

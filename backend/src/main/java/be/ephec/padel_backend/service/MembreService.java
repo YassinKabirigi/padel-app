@@ -18,7 +18,6 @@ public class MembreService {
     private final AdministrateurRepository administrateurRepository;
 
     @Autowired
-    @Autowired
     public MembreService(MembreRepository membreRepository,
                         AdministrateurRepository administrateurRepository) {
         this.membreRepository = membreRepository;

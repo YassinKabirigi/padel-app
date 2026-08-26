@@ -236,3 +236,54 @@ fonctionnalité/service/controller), chaque commit référence son issue via
 "closes #N" ou "refs #N" (pour les issues « parapluie » couvrant plusieurs
 commits) pour la traçabilité. Historique complet disponible sur
 github.com/YassinKabirigi/padel-app.
+
+## Sécurité base de données — utilisateur SQL dédié (25/08/2026)
+
+### Exigence de l'énoncé
+
+L'énoncé impose explicitement : *"il ne faut pas utiliser un user qui a l'entièreté des droits.
+Vous devez avoir des users spécifiques avec des droits spécifiques."*
+
+### Solution retenue : utilisateur `padel_app`
+
+Un login SQL Server dédié `padel_app` est créé par le script `init.sql` exécuté au démarrage
+du conteneur Docker (avant Flyway). Spring Boot se connecte **uniquement** avec cet utilisateur.
+
+**Droits accordés à `padel_app` sur la base `padel` :**
+
+| Rôle SQL Server   | Raison                                                    |
+|-------------------|-----------------------------------------------------------|
+| `db_datareader`   | SELECT sur toutes les tables (lecture des données)        |
+| `db_datawriter`   | INSERT / UPDATE / DELETE (écriture des données)           |
+| `db_ddladmin`     | CREATE TABLE / ALTER (nécessaire pour les migrations Flyway) |
+
+**Droits explicitement refusés :**
+
+- `sysadmin` / `serveradmin` — pas d'accès au niveau serveur
+- `securityadmin` — ne peut pas créer/modifier d'autres logins
+- `dbcreator` — ne peut pas créer ou supprimer de bases de données
+- `processadmin`, `setupadmin`, `bulkadmin`, `diskadmin`
+
+`padel_app` est strictement limité à la base `padel`. Le compte `sa` est uniquement utilisé
+dans le script d'initialisation Docker (`init.sql`), jamais par l'application elle-même.
+
+### Choix : accès direct aux tables (JPA/Hibernate) plutôt que vues/procédures stockées
+
+**Option retenue :** accès direct aux tables via JPA/Hibernate.
+
+**Justification :**
+JPA génère des requêtes paramétrées (PreparedStatement), ce qui protège nativement contre
+l'injection SQL sans nécessiter des procédures stockées. L'ORM offre une couche d'abstraction
+équivalente à celle des vues pour la lisibilité du code.
+
+**Conséquences assumées de ce choix :**
+- Le schéma de table est directement visible par `padel_app` (pas de masquage via vues)
+- Toute logique de filtrage est portée par la couche service Java, pas par la DB
+- Plus simple à maintenir pour un projet de cette taille
+
+**Ce qu'aurait apporté l'alternative (vues / procédures stockées) :**
+- Masquage du schéma physique : le client voit une interface stable même si les tables changent
+- Règles métier enforceables au niveau DB (ex. trigger sur la transition privé→public)
+- Audit plus fin des opérations (chaque procédure est une entrée d'audit naturelle)
+- Contre-partie : incompatible avec certaines fonctionnalités JPA (lazy loading, mappings complexes),
+  et nécessiterait de dupliquer une partie de la logique métier entre Java et T-SQL

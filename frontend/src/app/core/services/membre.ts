@@ -10,7 +10,10 @@ export interface MembreModel {
   telephone: string;
   dateInscription: string;
   typeMembre: string;
-  site?: { idSite: number } | null;
+  site?: { idSite: number; nom: string } | null;
+  dateDebutPenalite?: string | null;
+  dateFinPenalite?: string | null;
+  motifPenalite?: string | null;
 }
 
 @Injectable({

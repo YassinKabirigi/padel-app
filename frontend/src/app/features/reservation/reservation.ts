@@ -21,6 +21,12 @@ import { Badge } from '../../shared/badge/badge';
 export class Reservation implements OnInit {
   terrains: TerrainModel[] = [];
   matchsDisponibles: MatchDisponibleModel[] = [];
+  filtreStatut: string = 'TOUS';
+
+  get matchsFiltres(): MatchDisponibleModel[] {
+    if (this.filtreStatut === 'TOUS') return this.matchsDisponibles;
+    return this.matchsDisponibles.filter(m => m.statut === this.filtreStatut);
+  }
 
   idTerrainSelectionne: number | null = null;
   date: string = '';

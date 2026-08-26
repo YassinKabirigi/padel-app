@@ -8,6 +8,8 @@ export interface TerrainModel {
   site: {
     idSite: number;
     nom: string;
+    heureOuverture?: string;
+    heureFermeture?: string;
   };
 }
 

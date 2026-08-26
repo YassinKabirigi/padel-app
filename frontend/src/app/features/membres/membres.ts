@@ -23,6 +23,11 @@ import { AdministrateurDialog } from './administrateur-dialog/administrateur-dia
 export class Membres implements OnInit {
   sites: SiteModel[] = [];
   membres: MembreModel[] = [];
+  membreExpande: string | null = null;
+
+  toggleProfil(matricule: string): void {
+    this.membreExpande = this.membreExpande === matricule ? null : matricule;
+  }
   administrateurs: AdministrateurModel[] = [];
   penalites: PenaliteModel[] = [];
 

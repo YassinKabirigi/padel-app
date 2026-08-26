@@ -77,8 +77,18 @@
             @for (terrain of terrains; track terrain.idTerrain) {
               <mat-card>
                 <mat-card-content>
-                  <h3 style="margin-top: 0;">🎾 {{ terrain.numero }}</h3>
-                  <p style="color: #999; margin: 0.25rem 0;">📍 {{ terrain.site.nom }}</p>
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                      <h3 style="margin-top: 0;">🎾 {{ terrain.numero }}</h3>
+                      <p style="color: #999; margin: 0.25rem 0;">📍 {{ terrain.site.nom }}</p>
+                      <p style="color: #999; margin: 0.25rem 0; font-size: 0.8rem;">
+                        🕐 {{ terrain.site.heureOuverture | slice:0:5 }} – {{ terrain.site.heureFermeture | slice:0:5 }}
+                      </p>
+                    </div>
+                    <span style="background: rgba(102,187,106,0.15); color: #66bb6a; border: 1px solid #66bb6a; border-radius: 12px; padding: 0.15rem 0.6rem; font-size: 0.75rem; white-space: nowrap;">
+                      ✅ Actif
+                    </span>
+                  </div>
                 </mat-card-content>
                 <mat-card-actions>
                   <button mat-button (click)="ouvrirDialogTerrain(terrain)">Modifier</button>
