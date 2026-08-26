@@ -25,26 +25,27 @@ INSERT INTO TERRAIN (numero, id_site)
 VALUES ('Golden', 4), ('Masters', 4), ('Champions', 4);
 
 -- Administrateur global (identifiant de connexion : ADMIN-1)
-INSERT INTO ADMINISTRATEUR (nom, prenom, email, type_admin)
-VALUES ('Lambert', 'Sophie', 'sophie.lambert@padelclub.be', 'GLOBAL');
+INSERT INTO ADMINISTRATEUR (nom, prenom, email, type_admin, mot_de_passe)
+VALUES ('Lambert', 'Sophie', 'sophie.lambert@padelclub.be', 'GLOBAL', '$2b$10$avHl21uYdDdz8r9O3DG3/uEFcMO.HemdVAqOP.LTHLm0WYIJH5Bnu');
 
 -- Administrateurs de site (identifiants de connexion : ADMIN-2, ADMIN-3)
-INSERT INTO ADMINISTRATEUR (nom, prenom, email, type_admin, id_site)
+INSERT INTO ADMINISTRATEUR (nom, prenom, email, type_admin, id_site, mot_de_passe)
 VALUES
-    ('Moreau', 'Nicolas', 'nicolas.moreau@padelclub.be', 'SITE', 2),
-    ('Fontaine', 'Elise', 'elise.fontaine@padelclub.be', 'SITE', 4);
+    ('Moreau', 'Nicolas', 'nicolas.moreau@padelclub.be', 'SITE', 2, '$2b$10$avHl21uYdDdz8r9O3DG3/uEFcMO.HemdVAqOP.LTHLm0WYIJH5Bnu'),
+    ('Fontaine', 'Elise', 'elise.fontaine@padelclub.be', 'SITE', 4, '$2b$10$avHl21uYdDdz8r9O3DG3/uEFcMO.HemdVAqOP.LTHLm0WYIJH5Bnu');
 
 -- Membres varies (types Global / Site / Libre, repartis sur plusieurs sites)
-INSERT INTO MEMBRE (matricule, nom, prenom, email, telephone, date_inscription, type_membre, id_site)
+INSERT INTO MEMBRE (matricule, nom, prenom, email, telephone, date_inscription, type_membre, id_site, mot_de_passe)
 VALUES
-    ('S2201', 'Lefevre', 'Camille', 'camille.lefevre@outlook.com', '0478 22 33 44', '2025-11-03', 'SITE', 2),
-    ('S2202', 'Bernard', 'Antoine', 'antoine.bernard@hotmail.com', '0479 44 55 66', '2025-12-18', 'SITE', 2),
-    ('S2401', 'Gerard', 'Chloe', 'chloe.gerard@gmail.com', '0470 55 66 77', '2026-01-22', 'SITE', 4),
-    ('L3301', 'Dubois', 'Laura', 'laura.dubois@gmail.com', '0472 66 77 88', '2026-02-10', 'LIBRE', NULL),
-    ('L3302', 'Simon', 'Julien', 'julien.simon@gmail.com', '0473 88 99 00', '2026-03-05', 'LIBRE', NULL),
-    ('L3303', 'Renard', 'Nathan', 'nathan.renard@outlook.com', '0471 99 00 11', '2026-01-30', 'LIBRE', NULL),
-    ('G1043', 'Rousseau', 'Marie', 'marie.rousseau@gmail.com', '0474 11 22 33', '2025-10-20', 'GLOBAL', NULL),
-    ('G1044', 'Petit', 'Alexandre', 'alexandre.petit@yahoo.fr', '0475 33 44 55', '2026-01-08', 'GLOBAL', NULL);
+    ('S2201', 'Lefevre', 'Camille', 'camille.lefevre@outlook.com', '0478 22 33 44', '2025-11-03', 'SITE', 2, '$2b$10$S6kDOFA9yQKEwKboJLYii.XUqtdAYaddsLieB9MkCeA8N9uOPOy8a'),
+    ('S2202', 'Bernard', 'Antoine', 'antoine.bernard@hotmail.com', '0479 44 55 66', '2025-12-18', 'SITE', 2, '$2b$10$S6kDOFA9yQKEwKboJLYii.XUqtdAYaddsLieB9MkCeA8N9uOPOy8a'),
+    ('S2401', 'Gerard', 'Chloe', 'chloe.gerard@gmail.com', '0470 55 66 77', '2026-01-22', 'SITE', 4, '$2b$10$S6kDOFA9yQKEwKboJLYii.XUqtdAYaddsLieB9MkCeA8N9uOPOy8a'),
+    ('L3301', 'Dubois', 'Laura', 'laura.dubois@gmail.com', '0472 66 77 88', '2026-02-10', 'LIBRE', NULL, '$2b$10$S6kDOFA9yQKEwKboJLYii.XUqtdAYaddsLieB9MkCeA8N9uOPOy8a'),
+    ('L3302', 'Simon', 'Julien', 'julien.simon@gmail.com', '0473 88 99 00', '2026-03-05', 'LIBRE', NULL, '$2b$10$S6kDOFA9yQKEwKboJLYii.XUqtdAYaddsLieB9MkCeA8N9uOPOy8a'),
+    ('L3303', 'Renard', 'Nathan', 'nathan.renard@outlook.com', '0471 99 00 11', '2026-01-30', 'LIBRE', NULL, '$2b$10$S6kDOFA9yQKEwKboJLYii.XUqtdAYaddsLieB9MkCeA8N9uOPOy8a'),
+    ('G1043', 'Rousseau', 'Marie', 'marie.rousseau@gmail.com', '0474 11 22 33', '2025-10-20', 'GLOBAL', NULL, '$2b$10$S6kDOFA9yQKEwKboJLYii.XUqtdAYaddsLieB9MkCeA8N9uOPOy8a'),
+    ('G1044', 'Petit', 'Alexandre', 'alexandre.petit@yahoo.fr', '0475 33 44 55', '2026-01-08', 'GLOBAL', NULL, '$2b$10$S6kDOFA9yQKEwKboJLYii.XUqtdAYaddsLieB9MkCeA8N9uOPOy8a');
+
 
 -- Matchs de demonstration (repartis sur les quatre sites, statuts varies)
 INSERT INTO [MATCH] (date_heure_debut, statut, id_terrain)
@@ -69,6 +70,6 @@ VALUES
     (GETDATE(), 0, 'S2202', 3),
     (GETDATE(), 1, 'L3302', 4),
     (GETDATE(), 1, 'G1044', 5),
-    (GETDATE(), 0, 'L3303', 6),
+    (GETDATE(), 1, 'L3303', 6),
     (GETDATE(), 1, 'S2401', 7),
     (GETDATE(), 0, 'G1043', 7);

@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 public class Match {
 
     public enum Statut {
-        PRIVE, PUBLIC
+        PRIVE, PUBLIC, ANNULE, TERMINE
     }
 
     @Id

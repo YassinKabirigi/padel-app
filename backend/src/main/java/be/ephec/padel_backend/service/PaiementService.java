@@ -90,7 +90,7 @@ public class PaiementService {
      * match en public et applique une pénalité à l'organisateur.
      * Destiné à être appelé une fois par jour (tâche planifiée).
      */
-    @Scheduled(cron = "0 0 0 * * *")  // tous les jours à minuit
+    @Scheduled(fixedRate = 3600000)  // toutes les heures (UC-03)
     public void verifierEtBasculerMatchesPrives() {
         LocalDate demain = LocalDate.now().plusDays(1);
 

@@ -30,7 +30,7 @@ CREATE TABLE [MATCH] (
                          id_match            INT IDENTITY(1,1) PRIMARY KEY,
     date_heure_debut    DATETIME2       NOT NULL,
     statut              NVARCHAR(20)    NOT NULL
-    CONSTRAINT CK_match_statut CHECK (statut IN ('PRIVE', 'PUBLIC')),
+    CONSTRAINT CK_match_statut CHECK (statut IN ('PRIVE', 'PUBLIC', 'ANNULE', 'TERMINE')),
     id_terrain          INT             NOT NULL,
     CONSTRAINT FK_match_terrain FOREIGN KEY (id_terrain) REFERENCES TERRAIN(id_terrain)
     );
@@ -39,12 +39,13 @@ CREATE TABLE MEMBRE (
                         matricule           NVARCHAR(10)    PRIMARY KEY,
                         nom                 NVARCHAR(100)   NOT NULL,
                         prenom              NVARCHAR(100)   NOT NULL,
-                        email               NVARCHAR(255)   NOT NULL,
+                        email               NVARCHAR(255)   NOT NULL UNIQUE,
                         telephone           NVARCHAR(20)    NULL,
                         date_inscription    DATE            NOT NULL,
                         date_debut_penalite DATE            NULL,
                         date_fin_penalite   DATE            NULL,
                         motif_penalite      NVARCHAR(255)   NULL,
+                        mot_de_passe        NVARCHAR(255)   NULL,
                         type_membre         NVARCHAR(10)    NOT NULL
         CONSTRAINT CK_membre_type CHECK (type_membre IN ('GLOBAL', 'SITE', 'LIBRE')),
                         id_site             INT             NULL,  -- utilisé uniquement si type_membre = 'SITE'
@@ -58,7 +59,7 @@ CREATE TABLE MEMBRE (
 
 CREATE TABLE PAIEMENT (
                           id_paiement     INT IDENTITY(1,1) PRIMARY KEY,
-                          montant         DECIMAL(6,2)    NOT NULL,
+                          montant         DECIMAL(6,2)    NOT NULL CHECK (montant > 0),
                           date_paiement   DATETIME2       NOT NULL
 );
 
@@ -71,14 +72,16 @@ CREATE TABLE PARTICIPATION (
                                id_paiement         INT             NULL,
                                CONSTRAINT FK_participation_membre FOREIGN KEY (matricule) REFERENCES MEMBRE(matricule),
                                CONSTRAINT FK_participation_match FOREIGN KEY (id_match) REFERENCES [MATCH](id_match),
-                               CONSTRAINT FK_participation_paiement FOREIGN KEY (id_paiement) REFERENCES PAIEMENT(id_paiement)
+                               CONSTRAINT FK_participation_paiement FOREIGN KEY (id_paiement) REFERENCES PAIEMENT(id_paiement),
+               CONSTRAINT UQ_participation_membre_match UNIQUE (matricule, id_match)
 );
 
 CREATE TABLE ADMINISTRATEUR (
                                 id_admin        INT IDENTITY(1,1) PRIMARY KEY,
                                 nom             NVARCHAR(100)   NOT NULL,
                                 prenom          NVARCHAR(100)   NOT NULL,
-                                email           NVARCHAR(255)   NOT NULL,
+                                email           NVARCHAR(255)   NOT NULL UNIQUE,
+                                mot_de_passe    NVARCHAR(255)   NULL,
                                 type_admin      NVARCHAR(10)    NOT NULL
         CONSTRAINT CK_admin_type CHECK (type_admin IN ('GLOBAL', 'SITE')),
                                 id_site         INT             NULL,  -- utilisé uniquement si type_admin = 'SITE'
