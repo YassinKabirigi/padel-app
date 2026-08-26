@@ -1,6 +1,9 @@
 package be.ephec.padel_backend.service;
 
+import be.ephec.padel_backend.dto.MonProfilDto;
+import be.ephec.padel_backend.entity.Administrateur;
 import be.ephec.padel_backend.entity.Membre;
+import be.ephec.padel_backend.repository.AdministrateurRepository;
 import be.ephec.padel_backend.repository.MembreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,10 +15,14 @@ import java.util.Optional;
 public class MembreService {
 
     private final MembreRepository membreRepository;
+    private final AdministrateurRepository administrateurRepository;
 
     @Autowired
-    public MembreService(MembreRepository membreRepository) {
+    @Autowired
+    public MembreService(MembreRepository membreRepository,
+                        AdministrateurRepository administrateurRepository) {
         this.membreRepository = membreRepository;
+        this.administrateurRepository = administrateurRepository;
     }
 
     public List<Membre> getAllMembres() {
@@ -43,4 +50,20 @@ public class MembreService {
     public void deleteMembre(String matricule) {
         membreRepository.deleteById(matricule);
     }
+    public MonProfilDto getMonProfil(String identifiant) {
+        if (identifiant.startsWith("ADMIN-")) {
+            Integer idAdmin = Integer.parseInt(identifiant.substring(6));
+            Administrateur admin = administrateurRepository.findById(idAdmin)
+                    .orElseThrow(() -> new IllegalStateException("Administrateur introuvable"));
+            String siteNom = admin.getSite() != null ? admin.getSite().getNom() : null;
+            return new MonProfilDto(identifiant, admin.getNom(), admin.getPrenom(),
+                    admin.getEmail(), null, "ADMIN_" + admin.getTypeAdmin().name(), siteNom);
+        }
+        Membre membre = membreRepository.findById(identifiant)
+                .orElseThrow(() -> new IllegalStateException("Membre introuvable"));
+        String siteNom = membre.getSite() != null ? membre.getSite().getNom() : null;
+        return new MonProfilDto(membre.getMatricule(), membre.getNom(), membre.getPrenom(),
+                membre.getEmail(), membre.getTelephone(), membre.getTypeMembre().name(), siteNom);
+    }
+
 }

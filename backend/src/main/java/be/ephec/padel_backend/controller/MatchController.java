@@ -25,15 +25,19 @@ public class MatchController {
     }
 
     @PostMapping
-    public ResponseEntity<Match> creerMatch(@RequestBody CreerMatchRequest request) {
+    public ResponseEntity<Match> creerMatch(@RequestBody CreerMatchRequest request,
+                                            Authentication authentication) {
         Match.Statut statut = Match.Statut.valueOf(request.getStatut());
         LocalDateTime dateHeureDebut = LocalDateTime.parse(request.getDateHeureDebut());
+
+        // L'organisateur est toujours le membre connecté — pas de champ dans la requête
+        String matriculeOrganisateur = authentication.getName();
 
         Match match = reservationService.creerMatch(
                 request.getIdTerrain(),
                 dateHeureDebut,
                 statut,
-                request.getMatriculeOrganisateur(),
+                matriculeOrganisateur,
                 request.getMatriculesCoequipiers()
         );
         return ResponseEntity.status(201).body(match);

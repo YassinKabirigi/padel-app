@@ -7,8 +7,10 @@ import be.ephec.padel_backend.repository.MembreRepository;
 import be.ephec.padel_backend.repository.ParticipationRepository;
 import be.ephec.padel_backend.repository.TerrainRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import be.ephec.padel_backend.dto.MatchDisponibleDto;
+import be.ephec.padel_backend.dto.ParticipationDetailDto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -21,6 +23,7 @@ public class ReservationService {
     private static final int BATTEMENT_MINUTES = 15;
     private static final int BLOCAGE_TOTAL_MINUTES = DUREE_MATCH_MINUTES + BATTEMENT_MINUTES; // 105
 
+    private final PaiementService paiementService;
     private final MatchRepository matchRepository;
     private final JourFermetureRepository jourFermetureRepository;
     private final TerrainRepository terrainRepository;
@@ -28,11 +31,13 @@ public class ReservationService {
     private final ParticipationRepository participationRepository;
 
     @Autowired
-    public ReservationService(MatchRepository matchRepository,
+    public ReservationService(@Lazy PaiementService paiementService,
+                              MatchRepository matchRepository,
                               JourFermetureRepository jourFermetureRepository,
                               TerrainRepository terrainRepository,
                               MembreRepository membreRepository,
                               ParticipationRepository participationRepository) {
+        this.paiementService = paiementService;
         this.matchRepository = matchRepository;
         this.jourFermetureRepository = jourFermetureRepository;
         this.terrainRepository = terrainRepository;
@@ -158,6 +163,10 @@ public class ReservationService {
             throw new IllegalStateException("Le membre a une penalite active");
         }
 
+        if (!paiementService.peutReserver(organisateur)) {
+            throw new IllegalStateException("Ce membre a un solde impaye — regularisez avant de reserver");
+        }
+
         if (!isDelaiRespecte(organisateur, dateHeureDebut)) {
             throw new IllegalStateException("Delai de reservation non respecte pour ce type de membre");
         }
@@ -221,6 +230,7 @@ public class ReservationService {
      */
     public List<MatchDisponibleDto> getMatchsDisponibles(String matriculeMembreConnecte) {
         List<Match> tousLesMatchs = matchRepository.findAll();
+        Membre membreConnecte = membreRepository.findById(matriculeMembreConnecte).orElse(null);
 
         return tousLesMatchs.stream()
                 .map(match -> {
@@ -231,6 +241,9 @@ public class ReservationService {
                     boolean dejaParticipant = participations.stream()
                             .anyMatch(p -> p.getMembre().getMatricule().equals(matriculeMembreConnecte));
 
+                    boolean peutRejoindre = membreConnecte != null
+                            && isTerrainAutorise(membreConnecte, match.getTerrain());
+
                     return new MatchDisponibleDto(
                             match.getIdMatch(),
                             match.getDateHeureDebut(),
@@ -238,7 +251,8 @@ public class ReservationService {
                             match.getTerrain().getSite().getNom(),
                             match.getStatut().name(),
                             participations.size(),
-                            dejaParticipant
+                            dejaParticipant,
+                            peutRejoindre
                     );
                 })
                 .filter(dto -> dto.getNbParticipants() < 4 && dto.getDateHeureDebut().isAfter(LocalDateTime.now()))
@@ -293,7 +307,35 @@ public class ReservationService {
 
         return participationRepository.save(participation);
     }
+    public List<ParticipationDetailDto> getAllParticipationDetails() {
+        return participationRepository.findAll().stream()
+                .map(this::toParticipationDetailDto)
+                .toList();
+    }
 
+    public List<ParticipationDetailDto> getParticipationDetailsParMembre(String matricule) {
+        return participationRepository.findAll().stream()
+                .filter(p -> p.getMembre().getMatricule().equals(matricule))
+                .map(this::toParticipationDetailDto)
+                .toList();
+    }
 
+    private ParticipationDetailDto toParticipationDetailDto(
+            be.ephec.padel_backend.entity.Participation p) {
+        return new ParticipationDetailDto(
+                p.getIdParticipation(),
+                p.getMembre().getMatricule(),
+                p.getMembre().getPrenom() + " " + p.getMembre().getNom(),
+                p.getMatch().getDateHeureDebut(),
+                p.getMatch().getTerrain().getNumero(),
+                p.getMatch().getTerrain().getSite().getNom(),
+                p.getMatch().getStatut().name(),
+                p.getEstOrganisateur(),
+                p.getPaiement() != null,
+                p.getPaiement() != null
+                        ? p.getPaiement().getMontant().toString() + " EUR"
+                        : "Non paye"
+        );
+    }
 
 }

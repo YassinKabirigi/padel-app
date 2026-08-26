@@ -5,13 +5,18 @@
     </mat-card-header>
     <mat-card-content>
       <form (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 0.5rem;">
           <mat-label>Matricule</mat-label>
-          <input matInput [(ngModel)]="matricule" name="matricule" placeholder="Ex: G0042" />
+          <input matInput [(ngModel)]="matricule" name="matricule" placeholder="Ex: G1042" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 0.5rem;">
+          <mat-label>Mot de passe</mat-label>
+          <input matInput type="password" [(ngModel)]="motDePasse" name="motDePasse" />
         </mat-form-field>
 
         @if (erreur) {
-          <p style="color: red;">{{ erreur }}</p>
+          <p style="color: red; margin-bottom: 0.5rem;">{{ erreur }}</p>
         }
 
         <button mat-raised-button color="primary" type="submit" [disabled]="chargement" style="width: 100%;">

@@ -23,6 +23,7 @@ export interface MatchDisponibleModel {
   statut: string;
   nbParticipants: number;
   dejaParticipant: boolean;
+  peutRejoindre: boolean;
 }
 
 @Injectable({

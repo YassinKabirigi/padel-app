@@ -47,7 +47,7 @@ VALUES
     ('G1044', 'Petit', 'Alexandre', 'alexandre.petit@yahoo.fr', '0475 33 44 55', '2026-01-08', 'GLOBAL', NULL);
 
 -- Matchs de demonstration (repartis sur les quatre sites, statuts varies)
-INSERT INTO MATCH (date_heure_debut, statut, id_terrain)
+INSERT INTO [MATCH] (date_heure_debut, statut, id_terrain)
 VALUES
     (DATEADD(DAY, 25, GETDATE()), 'PRIVE', 1),
     (DATEADD(DAY, 27, GETDATE()), 'PUBLIC', 2),

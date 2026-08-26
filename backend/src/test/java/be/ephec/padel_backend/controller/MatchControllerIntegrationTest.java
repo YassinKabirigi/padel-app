@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -87,7 +87,6 @@ class MatchControllerIntegrationTest {
         body.put("idTerrain", idTerrainTest);
         body.put("dateHeureDebut", dateHeureDebut.toString());
         body.put("statut", "PRIVE");
-        body.put("matriculeOrganisateur", matriculeTest);
 
         mockMvc.perform(post("/api/matches")
                         .header("Authorization", "Bearer " + token)
@@ -104,7 +103,6 @@ class MatchControllerIntegrationTest {
         body.put("idTerrain", idTerrainTest);
         body.put("dateHeureDebut", dateHeureDebut.toString());
         body.put("statut", "PRIVE");
-        body.put("matriculeOrganisateur", "G0001");
 
         mockMvc.perform(post("/api/matches")
                         .contentType(MediaType.APPLICATION_JSON)

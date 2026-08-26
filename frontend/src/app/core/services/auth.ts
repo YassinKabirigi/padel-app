@@ -19,8 +19,8 @@ export class Auth {
 
   constructor(private http: HttpClient) {}
 
-  login(matricule: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { matricule }).pipe(
+  login(matricule: string, motDePasse: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { matricule, motDePasse }).pipe(
       tap((response) => {
         this.currentToken = response.token;
         this.currentTypeMembre = response.typeMembre;
@@ -35,19 +35,8 @@ export class Auth {
     this.currentMatricule = null;
   }
 
-  getToken(): string | null {
-    return this.currentToken;
-  }
-
-  getTypeMembre(): string | null {
-    return this.currentTypeMembre;
-  }
-
-  getMatricule(): string | null {
-    return this.currentMatricule;
-  }
-
-  isAuthenticated(): boolean {
-    return this.currentToken !== null;
-  }
+  getToken(): string | null { return this.currentToken; }
+  getTypeMembre(): string | null { return this.currentTypeMembre; }
+  getMatricule(): string | null { return this.currentMatricule; }
+  isAuthenticated(): boolean { return this.currentToken !== null; }
 }

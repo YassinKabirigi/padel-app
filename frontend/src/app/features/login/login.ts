@@ -16,21 +16,22 @@ import { Auth } from '../../core/services/auth';
 })
 export class Login {
   matricule: string = '';
+  motDePasse: string = '';
   erreur: string = '';
   chargement: boolean = false;
 
   constructor(private authService: Auth, private router: Router) {}
 
   onSubmit(): void {
-    if (!this.matricule.trim()) {
-      this.erreur = 'Veuillez entrer un matricule';
+    if (!this.matricule.trim() || !this.motDePasse.trim()) {
+      this.erreur = 'Veuillez entrer votre matricule et votre mot de passe';
       return;
     }
 
     this.chargement = true;
     this.erreur = '';
 
-    this.authService.login(this.matricule).subscribe({
+    this.authService.login(this.matricule.trim(), this.motDePasse).subscribe({
       next: () => {
         this.chargement = false;
         this.router.navigate(['/dashboard']);
@@ -38,7 +39,7 @@ export class Login {
       error: (err) => {
         this.chargement = false;
         if (err.status === 401) {
-          this.erreur = 'Matricule inconnu';
+          this.erreur = 'Identifiant ou mot de passe incorrect';
         } else {
           this.erreur = 'Erreur de connexion au serveur';
         }

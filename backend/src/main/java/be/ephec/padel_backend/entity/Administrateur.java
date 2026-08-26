@@ -24,6 +24,9 @@ public class Administrateur {
     @Column(name = "email", nullable = false, length = 255)
     private String email;
 
+    @Column(name = "mot_de_passe")
+    private String motDePasse;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type_admin", nullable = false, length = 10)
     private TypeAdmin typeAdmin;
@@ -84,4 +87,7 @@ public class Administrateur {
     public void setSite(Site site) {
         this.site = site;
     }
+
+    public String getMotDePasse() { return motDePasse; }
+    public void setMotDePasse(String motDePasse) { this.motDePasse = motDePasse; }
 }

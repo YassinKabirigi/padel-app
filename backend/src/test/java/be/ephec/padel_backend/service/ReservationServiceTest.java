@@ -26,7 +26,7 @@ class ReservationServiceTest {
         // Repositories non utilises directement par les methodes testees ici,
         // on peut passer null car ces methodes ne font pas d'appel base de donnees
         reservationService = new ReservationService(
-                null, null, null, null, null
+                null, null, null, null, null, null
         );
     }
 

@@ -1,8 +1,14 @@
 package be.ephec.padel_backend.service;
 
 import be.ephec.padel_backend.entity.*;
-        import be.ephec.padel_backend.repository.MatchRepository;
+import be.ephec.padel_backend.dto.HistoriquePaiementDto;
+import be.ephec.padel_backend.dto.MesPaiementsDto;
+import be.ephec.padel_backend.dto.MesStatistiquesDto;
+import be.ephec.padel_backend.repository.MatchRepository;
+import be.ephec.padel_backend.repository.PaiementRepository;
+import be.ephec.padel_backend.repository.MembreRepository;
 import be.ephec.padel_backend.repository.ParticipationRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +24,20 @@ public class PaiementService {
     private static final int NB_JOUEURS_REQUIS = 4;
     private static final int PENALITE_JOURS = 7;
 
+    private final MembreRepository membreRepository;
+    private final PaiementRepository paiementRepository;
     private final MatchRepository matchRepository;
     private final ParticipationRepository participationRepository;
 
     @Autowired
-    public PaiementService(MatchRepository matchRepository,
-                           ParticipationRepository participationRepository) {
+    public PaiementService(MembreRepository membreRepository,
+                           MatchRepository matchRepository,
+                           ParticipationRepository participationRepository,
+                           PaiementRepository paiementRepository) {
+        this.membreRepository = membreRepository;
         this.matchRepository = matchRepository;
         this.participationRepository = participationRepository;
+        this.paiementRepository = paiementRepository;
     }
 
     /**
@@ -78,6 +90,7 @@ public class PaiementService {
      * match en public et applique une pénalité à l'organisateur.
      * Destiné à être appelé une fois par jour (tâche planifiée).
      */
+    @Scheduled(cron = "0 0 0 * * *")  // tous les jours à minuit
     public void verifierEtBasculerMatchesPrives() {
         LocalDate demain = LocalDate.now().plusDays(1);
 
@@ -113,7 +126,67 @@ public class PaiementService {
                     organisateur.setDateDebutPenalite(LocalDate.now());
                     organisateur.setDateFinPenalite(LocalDate.now().plusDays(PENALITE_JOURS));
                     organisateur.setMotifPenalite("Match prive non complete avant la veille");
-                    // Sauvegarde via MembreRepository à faire dans le controller/orchestration
+                    membreRepository.save(organisateur);
                 });
     }
+    public MesPaiementsDto getMesPaiements(String matricule) {
+        List<Participation> participations = participationRepository.findAll().stream()
+                .filter(p -> p.getMembre().getMatricule().equals(matricule))
+                .toList();
+        java.math.BigDecimal du = PRIX_PAR_JOUEUR.multiply(java.math.BigDecimal.valueOf(participations.size()));
+        java.math.BigDecimal paye = participations.stream()
+                .filter(p -> p.getPaiement() != null)
+                .map(p -> PRIX_PAR_JOUEUR)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        return new MesPaiementsDto(du, paye, du.subtract(paye));
+    }
+
+    public MesStatistiquesDto getMesStatistiques(String matricule) {
+        List<Participation> participations = participationRepository.findAll().stream()
+                .filter(p -> p.getMembre().getMatricule().equals(matricule))
+                .toList();
+        LocalDateTime now = LocalDateTime.now();
+        long joues = participations.stream().filter(p -> p.getMatch().getDateHeureDebut().isBefore(now)).count();
+        long aVenir = participations.stream().filter(p -> p.getMatch().getDateHeureDebut().isAfter(now)).count();
+        long prives = participations.stream().filter(p -> p.getMatch().getStatut() == Match.Statut.PRIVE).count();
+        long publics = participations.stream().filter(p -> p.getMatch().getStatut() == Match.Statut.PUBLIC).count();
+        return new MesStatistiquesDto(joues, aVenir, prives, publics);
+    }
+
+    public List<HistoriquePaiementDto> getHistoriquePaiements(String matricule) {
+        return participationRepository.findAll().stream()
+                .filter(p -> p.getMembre().getMatricule().equals(matricule))
+                .map(p -> {
+                    Paiement paiement = p.getPaiement();
+                    java.math.BigDecimal montant = paiement != null ? paiement.getMontant() : PRIX_PAR_JOUEUR;
+                    LocalDateTime datePaiement = paiement != null ? paiement.getDatePaiement() : null;
+                    return new HistoriquePaiementDto(
+                            p.getIdParticipation(),
+                            paiement != null ? paiement.getIdPaiement() : null,
+                            montant, datePaiement,
+                            p.getMatch().getTerrain().getNumero(),
+                            p.getMatch().getTerrain().getSite().getNom(),
+                            p.getMatch().getDateHeureDebut(),
+                            p.getMatch().getStatut().name()
+                    );
+                })
+                .sorted((a, b) -> b.getDateMatch().compareTo(a.getDateMatch()))
+                .toList();
+    }
+
+    public void payerParticipation(Integer idParticipation, String matricule) {
+        Participation participation = participationRepository.findById(idParticipation)
+                .orElseThrow(() -> new IllegalStateException("Participation introuvable"));
+        if (!participation.getMembre().getMatricule().equals(matricule)) {
+            throw new IllegalStateException("Vous ne pouvez payer que vos propres participations");
+        }
+        if (participation.getPaiement() != null) {
+            throw new IllegalStateException("Cette participation est déjà payée");
+        }
+        Paiement paiement = effectuerPaiement(List.of(participation));
+        Paiement sauvegarde = paiementRepository.save(paiement);
+        participation.setPaiement(sauvegarde);
+        participationRepository.save(participation);
+    }
+
 }

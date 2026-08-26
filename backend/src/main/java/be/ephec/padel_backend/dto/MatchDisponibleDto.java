@@ -10,9 +10,11 @@ public class MatchDisponibleDto {
     private String statut;
     private long nbParticipants;
     private boolean dejaParticipant;
+    private boolean peutRejoindre;
 
     public MatchDisponibleDto(Integer idMatch, LocalDateTime dateHeureDebut, String terrainNumero,
-                              String siteNom, String statut, long nbParticipants, boolean dejaParticipant) {
+                              String siteNom, String statut, long nbParticipants,
+                              boolean dejaParticipant, boolean peutRejoindre) {
         this.idMatch = idMatch;
         this.dateHeureDebut = dateHeureDebut;
         this.terrainNumero = terrainNumero;
@@ -20,6 +22,7 @@ public class MatchDisponibleDto {
         this.statut = statut;
         this.nbParticipants = nbParticipants;
         this.dejaParticipant = dejaParticipant;
+        this.peutRejoindre = peutRejoindre;
     }
 
     public Integer getIdMatch() { return idMatch; }
@@ -29,4 +32,5 @@ public class MatchDisponibleDto {
     public String getStatut() { return statut; }
     public long getNbParticipants() { return nbParticipants; }
     public boolean isDejaParticipant() { return dejaParticipant; }
+    public boolean isPeutRejoindre() { return peutRejoindre; }
 }

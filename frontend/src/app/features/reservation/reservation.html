@@ -132,10 +132,12 @@
               </div>
               @if (m.dejaParticipant) {
                 <p style="color: #66bb6a; font-size: 0.85rem; margin: 0.3rem 0 0 0;">✓ Déjà inscrit</p>
-              } @else {
+              } @else if (m.peutRejoindre) {
                 <button mat-raised-button color="primary" (click)="rejoindre(m.idMatch)" style="width: 100%; margin-top: 0.5rem;">
                   Rejoindre
                 </button>
+              } @else {
+                <p style="color: #ef9a9a; font-size: 0.85rem; margin: 0.3rem 0 0 0;">🔒 Terrain non autorisé</p>
               }
             </div>
           } @empty {
