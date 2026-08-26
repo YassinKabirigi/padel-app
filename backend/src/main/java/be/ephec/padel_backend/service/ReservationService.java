@@ -241,8 +241,9 @@ public class ReservationService {
                     boolean dejaParticipant = participations.stream()
                             .anyMatch(p -> p.getMembre().getMatricule().equals(matriculeMembreConnecte));
 
-                    boolean peutRejoindre = membreConnecte != null
-                            && isTerrainAutorise(membreConnecte, match.getTerrain());
+                    // Admin (non trouvé comme membre) peut voir tous les matchs
+                    boolean peutRejoindre = membreConnecte == null
+                            || isTerrainAutorise(membreConnecte, match.getTerrain());
 
                     return new MatchDisponibleDto(
                             match.getIdMatch(),
