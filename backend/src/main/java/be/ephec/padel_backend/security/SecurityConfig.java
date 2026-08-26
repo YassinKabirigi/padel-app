@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/jours-fermeture/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
                         .requestMatchers(HttpMethod.DELETE, "/api/jours-fermeture/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
                         .requestMatchers("/api/penalites/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
+                        .requestMatchers(HttpMethod.GET, "/api/membres/*").authenticated()
                         .requestMatchers("/api/membres/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
                         .requestMatchers("/api/administrateurs/**").hasAuthority("ROLE_ADMIN_GLOBAL")
                         .requestMatchers("/api/participations/**").hasAnyAuthority("ROLE_ADMIN_GLOBAL", "ROLE_ADMIN_SITE")
